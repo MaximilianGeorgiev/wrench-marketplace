@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS LISTING;
+ 
+CREATE SCHEMA LISTING;
+
+CREATE TABLE LISTING (
+  id INT PRIMARY KEY,
+  price DOUBLE(255) NOT NULL,
+  seller VARCHAR(250) NOT NULL,
+  description VARCHAR(250) NOT NULL
+);
+ 
+INSERT INTO LISTING (id, price, seller, description) VALUES
+  (1, 25.5, 'Bai Hui', 'prodavam kur');

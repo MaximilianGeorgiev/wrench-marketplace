@@ -5,14 +5,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/test")
+@RequestMapping("/")
 @Controller
-public class TestController {
+public class MainController {
 
-	@GetMapping("/showTestPage")
-	public String showTestPage(Model theModel) {
-		
-		return "helloworld-view";
+	@GetMapping("/")
+	public String showMainPageUnlogged(Model theModel) {
+		return "mainpage_unlogged";
+	}
+	
+	@GetMapping("/logged")
+	public String showMainPageLogged(Model theModel) {
+		return "mainpage_logged";
 	}
 	
 }
