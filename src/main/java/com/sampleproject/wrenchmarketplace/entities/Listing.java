@@ -12,9 +12,12 @@ import javax.persistence.Table;
 public class Listing {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@Column(name="Id", nullable = false, unique = true) // if id is not set as not null throws exception since it is checked before a value is generated
 	private int id;
+	
+	@Column(name="title")
+	private String title;
 	
 	@Column(name="price")
 	private double price;
@@ -25,16 +28,52 @@ public class Listing {
 	@Column(name="description")
 	private String description;
 	
+	/*
+	@Column(name="category")
+	private String category;
+	*/
+	
 	//@Column(name="image")
 	//This will be handled later
 	
+
 	public Listing() {}
 	
-	//Seller is currently a string to test database
-	public Listing(double price, String seller, String description) {
+	public Listing(int id, String title, double price, String seller, String description) {
+		this.id = id;
+		this.title = title;
 		this.price = price;
 		this.seller = seller;
 		this.description = description;
+	}
+	
+	//Seller is currently a string to test database as well as category
+	public Listing(String title, double price, String seller, String description) {
+		this.title = title;
+		this.price = price;
+		this.seller = seller;
+		this.description = description;
+	}
+	
+
+	/*
+	public String getCategory() {
+		return category;
+	}
+	*/
+
+	/*
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	*/
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public int getId() {
@@ -72,7 +111,8 @@ public class Listing {
 	// use getSeller's getname method later when the entity is defined
 	@Override
 	public String toString() {
-		return "Listing ID #" + this.getId() + " ;Sold by: " + this.getSeller() + " ;Price: " + this.getPrice()
-		+ " \n Description: " + this.getDescription();
+		return "Listing ID #" + this.getId() + " ;Sold by: " + this.getSeller() + " ;Title: "
+	          + this.getTitle() + ";Price: " + this.getPrice()
+	          + " \n Description: " + this.getDescription();
 	}
 }
