@@ -10,6 +10,15 @@ CREATE TABLE LISTING (
   description VARCHAR(250) NOT NULL,
   category VARCHAR(250)
 );
+
+DROP TABLE IF EXISTS USER;
+
+CREATE TABLE USER (
+  Id INT PRIMARY KEY,
+  username VARCHAR(250) NOT NULL,
+  password VARCHAR(250) NOT NULL,
+  email VARCHAR(250) NOT NULL
+);
  
 /*
 INSERT INTO LISTING (Id, title, price, seller, description, category) VALUES

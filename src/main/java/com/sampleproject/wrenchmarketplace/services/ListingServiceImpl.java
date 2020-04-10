@@ -3,6 +3,7 @@ package com.sampleproject.wrenchmarketplace.services;
 import java.util.List;
 import java.util.Optional;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class ListingServiceImpl implements ListingService {
 	public ListingServiceImpl(ListingRepository listingRepository2) {
 		listingRepository = listingRepository2;
 	}
-
+	
 	@Override
 	public List<Listing> findAll() {
 		return listingRepository.findAll();
