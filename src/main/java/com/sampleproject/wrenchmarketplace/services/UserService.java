@@ -10,6 +10,10 @@ public interface UserService {
 	public List<User> findAll();
 	
 	public Optional<User> findById(int theId);
+	
+	public Optional<User> findByusername(String userName);
+	
+	public Optional<User> findByemail(String email);
 		
 	public void save(User seller);
 	

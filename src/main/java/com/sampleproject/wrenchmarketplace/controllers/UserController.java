@@ -1,5 +1,8 @@
 package com.sampleproject.wrenchmarketplace.controllers;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,10 +34,13 @@ public class UserController {
 	@PostMapping("/saveNewUser")
 	public String saveNewUser(@ModelAttribute("user") User theUser) {
 		
-		// if user with this email or username exists then it will redirect back to the creation form
-		//if (userService.findByUserName(theUser.getUsername()) != null) {
-		//	return "redirect:/createNewUser";
-	//	}
+	    //if user with this email or username exists then it will redirect back to the creation form
+		Optional<User> searchResultUserName = userService.findByusername(theUser.getUsername());
+		Optional<User> searchResultEmail = userService.findByemail(theUser.getEmail());
+		
+		if (searchResultUserName.isPresent() || searchResultEmail.isPresent()) {
+			return "redirect:/users/createNewUser";
+		}
 		
 		//otherwise push to db 
 		userService.save(theUser);

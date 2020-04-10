@@ -3,6 +3,7 @@ package com.sampleproject.wrenchmarketplace.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import com.sampleproject.wrenchmarketplace.dao.UserRepository;
@@ -16,12 +17,10 @@ public class UserServiceImpl implements UserService {
 		this.userRepository = userRepository;
 	}
 	
-	/*
 	private String hashPassword(String password){
 		return BCrypt.hashpw(password, BCrypt.gensalt());
 	}
-	*/
-	
+
 	@Override
 	public List<User> findAll() {
 		return userRepository.findAll();
@@ -32,10 +31,19 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findById(theId);
 	}
 	
+	@Override
+	public Optional<User> findByusername(String username){
+		return userRepository.findByusername(username);
+	}
+	
+	@Override
+	public Optional<User> findByemail(String email){
+		return userRepository.findByemail(email);
+	}
 
 	@Override
 	public void save(User seller) {
-		//seller.setPassword(hashPassword(seller.getPassword()));
+		seller.setPassword(hashPassword(seller.getPassword()));
 		userRepository.save(seller);
 	}
 
@@ -43,5 +51,4 @@ public class UserServiceImpl implements UserService {
 	public void deleteById(int theId) {
 		userRepository.deleteById(theId);
 	}
-
 }
