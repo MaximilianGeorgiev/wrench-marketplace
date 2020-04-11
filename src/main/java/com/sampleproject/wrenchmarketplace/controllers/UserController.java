@@ -46,4 +46,13 @@ public class UserController {
 		userService.save(theUser);
 		return "redirect:/";	
 	}
+	
+	public User verifyLogin(String username){
+		Optional<User> user = userService.findByusername(username);
+		
+		if (user.isPresent()) {
+			return user.get();
+		}
+		return null;
+	}
 }

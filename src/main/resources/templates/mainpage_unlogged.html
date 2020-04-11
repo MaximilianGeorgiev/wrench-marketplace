@@ -51,10 +51,10 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Login</a>
+            <a class="nav-link" th:href="@{/showLogin}">Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Register</a>
+            <a class="nav-link" th:href="@{/users/createNewUser}">Register</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">About</a>
@@ -76,7 +76,7 @@
       <div class="col-lg-5">
         <h1 class="font-weight-light">Wrench Marketplace</h1>
         <p>Your local marketplace for car parts, tools and specialized accessories you cannot come accross easily!</p>
-        <a class="btn btn-primary" href="#">Sign up to list an item!</a>
+        <a class="btn btn-primary" th:href="@{/users/createNewUser}">Sign up to list an item!</a>
       </div>
       <!-- /.col-md-4 -->
     </div>
