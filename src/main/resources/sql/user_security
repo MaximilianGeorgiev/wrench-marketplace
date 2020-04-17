@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS user_security;
+
+CREATE DATABASE IF NOT EXISTS user_security;
+USE user_security;
+
+CREATE TABLE `users` (
+  `username` varchar(50) NOT NULL,
+  `password` char(68) NOT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

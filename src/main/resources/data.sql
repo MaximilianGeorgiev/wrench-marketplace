@@ -1,4 +1,10 @@
 DROP TABLE IF EXISTS LISTING;
+DROP TABLE IF EXISTS USERS;
+DROP TABLE IF EXISTS USER;
+DROP TABLE IF EXISTS USER_ROLE;
+DROP TABLE IF EXISTS AUTHORITIES;	
+DROP TABLE IF EXISTS ROLE;
+
  
 CREATE SCHEMA LISTING;
 
@@ -11,15 +17,40 @@ CREATE TABLE LISTING (
   category VARCHAR(250)
 );
 
-DROP TABLE IF EXISTS USER;
-
 CREATE TABLE USER (
   Id INT PRIMARY KEY,
   username VARCHAR(250) NOT NULL,
   password VARCHAR(250) NOT NULL,
   email VARCHAR(250) NOT NULL
 );
- 
+
+INSERT INTO USER (Id, username, password, email) VALUES
+(1, 'Gesh', 'Gesh', 'Gesh');
+
+CREATE TABLE USERS (
+username VARCHAR(250) PRIMARY KEY NOT NULL,
+password VARCHAR(250) NOT NULL,
+enabled tinyint(1) NOT NULL
+);
+
+INSERT INTO USERS (username, password, enabled) VALUES
+('Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 1);
+
+
+CREATE TABLE AUTHORITIES (
+username VARCHAR(250) NOT NULL,
+authority VARCHAR(250) NOT NULL,
+UNIQUE KEY authorities_idx_1 (username, authority),
+  CONSTRAINT authorities_ibfk_1 FOREIGN KEY (username) REFERENCES USERS (username)
+);
+
+INSERT INTO AUTHORITIES VALUES ('Gesh', 'ROLE_ADMIN');
+
+CREATE TABLE ROLE (
+Id INT PRIMARY KEY,
+name VARCHAR(250) NOT NULL
+);
+
 /*
 INSERT INTO LISTING (Id, title, price, seller, description, category) VALUES
   (1, 'Kuroslav', 25.5, 'Bai Hui', 'prodavam kur', 'test');

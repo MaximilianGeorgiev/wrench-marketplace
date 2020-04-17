@@ -16,14 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MainController {
 	private UserController userController;
 	
-	
 	public MainController (UserController userController) {
 		this.userController = userController;
 	}
 
 	@GetMapping("/")
 	public String showMainPageUnlogged(Model theModel) {
-		return "mainpage_unlogged";
+		return "index";
 	}
 	
 	@GetMapping("/showLogin")
@@ -41,7 +40,6 @@ public class MainController {
 		 * if not redirect to login page again
 		 */
 		
-		
 		User user = userController.verifyLogin(username);
 		
 		if (user == null) {
@@ -52,12 +50,6 @@ public class MainController {
 			return "redirect:/showLogin";	
 		}
 		
-		return "redirect:/logged";
+		return "redirect:/";
 	}
-	
-	@GetMapping("/logged")
-	public String showMainPageLogged(Model theModel) {
-		return "mainpage_logged";
-	}
-	
 }
