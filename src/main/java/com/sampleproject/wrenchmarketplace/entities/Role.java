@@ -8,13 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "role")
+@Table(name = "ROLE")
 public class Role {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private Long id;
+	@Column(name = "Id")
+	private int Id;
 
 	@Column(name = "name")
 	private String name;
@@ -26,12 +26,12 @@ public class Role {
 		this.name = name;
 	}
 
-	public Long getId() {
-		return id;
+	public int getId() {
+		return Id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setId(int id) {
+		this.Id = id;
 	}
 
 	public String getName() {
@@ -44,6 +44,6 @@ public class Role {
 
 	@Override
 	public String toString() {
-		return "Role{" + "id=" + id + ", name='" + name + '\'' + '}';
+		return "Role{" + "id=" + Id + ", name='" + name + '\'' + '}';
 	}
 }

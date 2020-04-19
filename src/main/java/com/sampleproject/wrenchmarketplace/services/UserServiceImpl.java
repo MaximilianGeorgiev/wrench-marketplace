@@ -1,5 +1,7 @@
 package com.sampleproject.wrenchmarketplace.services;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
 		return BCrypt.hashpw(password, BCrypt.gensalt());
 	}
 
+
 	@Override
 	public List<User> findAll() {
 		return userRepository.findAll();
@@ -46,8 +49,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void save(User seller) {
-		seller.setPassword(hashPassword(seller.getPassword()));
+		seller.setPassword("{bcrypt}" + hashPassword(seller.getPassword())); // cannot find passwordencoder if bcrypt is not prefixed
+		seller.setRoles(Arrays.asList(roleRepository.findByname("ROLE_USER")));
+		seller.setEnabled(1);
+		
 		userRepository.save(seller);
+		roleRepository.insertIntoAuthorities(seller.getUsername(), "ROLE_USER"); // check RoleRepository for reference
 	}
 
 	@Override

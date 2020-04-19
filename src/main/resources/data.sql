@@ -1,11 +1,8 @@
 DROP TABLE IF EXISTS LISTING;
 DROP TABLE IF EXISTS USERS;
-DROP TABLE IF EXISTS USER;
-DROP TABLE IF EXISTS USER_ROLE;
-DROP TABLE IF EXISTS AUTHORITIES;	
+DROP TABLE IF EXISTS USERS_ROLES;
 DROP TABLE IF EXISTS ROLE;
 
- 
 CREATE SCHEMA LISTING;
 
 CREATE TABLE LISTING (
@@ -17,25 +14,35 @@ CREATE TABLE LISTING (
   category VARCHAR(250)
 );
 
-CREATE TABLE USER (
-  Id INT PRIMARY KEY,
+CREATE TABLE USERS (
+  Id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(250) NOT NULL,
   password VARCHAR(250) NOT NULL,
-  email VARCHAR(250) NOT NULL
+  email VARCHAR(250) NOT NULL,
+  enabled tinyint(1) NOT NULL
 );
 
-INSERT INTO USER (Id, username, password, email) VALUES
-(1, 'Gesh', 'Gesh', 'Gesh');
+INSERT INTO USERS (Id, username, password, email, enabled) VALUES
+(1, 'Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 'Gesh@gesh.ge', 1);
 
-CREATE TABLE USERS (
-username VARCHAR(250) PRIMARY KEY NOT NULL,
-password VARCHAR(250) NOT NULL,
-enabled tinyint(1) NOT NULL
+CREATE TABLE ROLE (
+Id INT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(250) NOT NULL
 );
 
-INSERT INTO USERS (username, password, enabled) VALUES
-('Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 1);
+INSERT INTO ROLE (name)
+VALUES 
+('ROLE_USER'),('ROLE_ADMIN');
 
+CREATE TABLE USER_ROLE (
+user_id INT NOT NULL,
+role_id INT NOT NULL,
+UNIQUE KEY user_role_idx_1 (user_id, role_id),
+  CONSTRAINT user_role_ibfk_1 FOREIGN KEY (user_id) REFERENCES USERS (Id)
+);
+
+INSERT INTO USER_ROLE (user_id, role_id) VALUES
+(1, 1);
 
 CREATE TABLE AUTHORITIES (
 username VARCHAR(250) NOT NULL,
@@ -45,13 +52,3 @@ UNIQUE KEY authorities_idx_1 (username, authority),
 );
 
 INSERT INTO AUTHORITIES VALUES ('Gesh', 'ROLE_ADMIN');
-
-CREATE TABLE ROLE (
-Id INT PRIMARY KEY,
-name VARCHAR(250) NOT NULL
-);
-
-/*
-INSERT INTO LISTING (Id, title, price, seller, description, category) VALUES
-  (1, 'Kuroslav', 25.5, 'Bai Hui', 'prodavam kur', 'test');
-*/
