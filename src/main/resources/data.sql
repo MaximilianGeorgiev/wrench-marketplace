@@ -9,9 +9,9 @@ CREATE TABLE LISTING (
   Id INT PRIMARY KEY,
   title VARCHAR(250) NOT NULL,
   price DOUBLE(255) NOT NULL,
-  seller VARCHAR(250),
   description VARCHAR(250) NOT NULL,
-  category VARCHAR(250)
+  category VARCHAR(250),
+  seller_id INT
 );
 
 CREATE TABLE USERS (
@@ -19,8 +19,12 @@ CREATE TABLE USERS (
   username VARCHAR(250) NOT NULL,
   password VARCHAR(250) NOT NULL,
   email VARCHAR(250) NOT NULL,
-  enabled tinyint(1) NOT NULL
+  enabled tinyint(1) NOT NULL,
+  listing_id INT
 );
+
+ALTER TABLE LISTING ADD CONSTRAINT FK_LISTING_USERS FOREIGN KEY (seller_id) REFERENCES USERS(Id);
+ALTER TABLE USERS ADD CONSTRAINT FK_USERS_LISTING FOREIGN KEY (listing_id) REFERENCES LISTING(Id);
 
 INSERT INTO USERS (Id, username, password, email, enabled) VALUES
 (1, 'Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 'Gesh@gesh.ge', 1);

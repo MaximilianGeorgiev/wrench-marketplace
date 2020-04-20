@@ -1,10 +1,14 @@
 package com.sampleproject.wrenchmarketplace.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 //With JPA it automatically maps to @Table("listing")
@@ -12,7 +16,7 @@ import javax.persistence.Table;
 public class Listing {
 	
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+	//@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	@Column(name="Id", nullable = false, unique = true) // if id is not set as not null throws exception since it is checked before a value is generated
 	private int id;
 	
@@ -22,8 +26,10 @@ public class Listing {
 	@Column(name="price")
 	private double price;
 	
-	@Column(name="seller")
-	private String seller;
+	/* it's a good practice to mark many-to-one side as the owning side. */
+	@ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "seller_id", referencedColumnName = "Id")
+	private User seller;
 	
 	@Column(name="description")
 	private String description;
@@ -39,7 +45,7 @@ public class Listing {
 
 	public Listing() {}
 	
-	public Listing(int id, String title, double price, String seller, String description) {
+	public Listing(int id, String title, double price, User seller, String description) {
 		this.id = id;
 		this.title = title;
 		this.price = price;
@@ -48,10 +54,9 @@ public class Listing {
 	}
 	
 	//Seller is currently a string to test database as well as category
-	public Listing(String title, double price, String seller, String description) {
+	public Listing(String title, double price, String description) {
 		this.title = title;
 		this.price = price;
-		this.seller = seller;
 		this.description = description;
 	}
 	
@@ -92,11 +97,11 @@ public class Listing {
 		this.price = price;
 	}
 
-	public String getSeller() {
+	public User getSeller() {
 		return seller;
 	}
 
-	public void setSeller(String seller) {
+	public void setSeller(User seller) {
 		this.seller = seller;
 	}
 

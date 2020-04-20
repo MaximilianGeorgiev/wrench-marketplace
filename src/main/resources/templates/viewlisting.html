@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<link rel="stylesheet" th:href="@{/css/bootstrap-grid.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap-grid.min.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap-reboot.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap-reboot.min.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+
+<link rel="stylesheet" th:href="@{/css/small-business.css}" />
+
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>Wrench Marketplace</title>
+
+</head>
+
+<body>
+
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+		<div class="container">
+			<a class="navbar-brand" href="#">WRENCH MARKETPLACE</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a class="nav-link" href="#">Home</a>
+					</li>
+					<div class="collapse navbar-collapse"
+						sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/showLogin}">Login</a></li>
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/users/createNewUser}">Register</a></li>
+					</div>
+					<div class="collapse navbar-collapse"
+						sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+						<li class="nav-item"><a class="nav-link" href="#">Your
+								listings</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">Watched</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="#">Settings</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="#">Logout</a>
+						</li>
+					</div>
+					<li class="nav-item"><a class="nav-link" href="#">About</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+		<div class="row align-items-center my-2">
+			<div class="row">
+				<div class="col-md-12 mb-5">
+					<div class="row align-items-center my-2">
+						<div class="col-lg-7">
+							<img class="img-fluid rounded mb-4 mb-lg-3"
+								src="http://placehold.it/900x400" alt="">
+						</div>
+						<div class="list-group col">
+							<h1 class="list-group-item list-group-item-dark"
+								th:text="${listing.title}"></h1>
+							<h1 class="list-group-item list-group-item-dark"
+								th:text="${listing.price}">EUR</h1>
+							<!--  <h1 class="list-group-item list-group-item-dark" th:text="${listing.category}"></h1> -->
+							<a href="#" class="list-group-item list-group-item-dark">View
+								seller profile</a> <a href="#"
+								class="list-group-item list-group-item-dark">Show contact
+								details</a> <a href="#" class="list-group-item list-group-item-dark">Report
+								listing</a>
+							<h1 class="list-group-item list-group-item-dark"
+								th:text="${listing.description}"></h1>
+						</div>
+						<div class="col-lg-7">
+							<img class="img-fluid rounded mb-4 mb-lg-6"
+								src="http://placehold.it/211x211" alt=""> <img
+								class="img-fluid rounded mb-4 mb-lg-6"
+								src="http://placehold.it/211x211" alt=""> <img
+								class="img-fluid rounded mb-4 mb-lg-6"
+								src="http://placehold.it/211x211" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
