@@ -17,49 +17,40 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 @EnableWebSecurity
 public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
 	@Autowired
 	@Qualifier("securityDataSource")
 	private DataSource securityDataSource;
-		
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.jdbcAuthentication().dataSource(securityDataSource);
-		
-	}
 
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests()
-			.antMatchers("/listings/createNewListing/").hasAnyRole("USER", "ADMIN")
-			.antMatchers("/users/createNewUser/").permitAll()
-			.antMatchers("/showLogin").permitAll()
-			.antMatchers("/resources/**").permitAll()
-			.antMatchers("/h2/**").permitAll()
-			.and()
-			.formLogin()
+		http.authorizeRequests().antMatchers("/listings/createNewListing/").hasAnyRole("USER", "ADMIN")
+				.antMatchers("/listings/saveNewListing/").hasAnyRole("USER", "ADMIN")
+				.antMatchers("/users/createNewUser/").permitAll()
+				.antMatchers("/showLogin").permitAll()
+				.antMatchers("/resources/**").permitAll()
+				.antMatchers("/h2/**").permitAll()
+				.and()
+				.formLogin()
 				.loginPage("/showLogin")
-				.loginProcessingUrl("/authenticateTheUser") // Spring boot behind the scenes API 
-				.defaultSuccessUrl("/")
-				.permitAll()
-			.and()
-			.logout().permitAll();
-			//.and()
-			//.exceptionHandling().accessDeniedPage("/access-denied");
-		
+				.loginProcessingUrl("/authenticateTheUser") // Spring boot behind the scenes API
+				.defaultSuccessUrl("/").permitAll()
+				.and()
+				.logout()
+				.permitAll();
+
 		/*
-		 * Both options disabled because otherwise /h2 path will require constant authentication
-		 * even though it is a white listed API.
+		 * Both options disabled because otherwise /h2 path will require constant
+		 * authentication even though it is a white listed API.
 		 */
-		 http.csrf().disable();
-		 http.headers().frameOptions().disable();
+		http.csrf().disable();
+		http.headers().frameOptions().disable();
 	}
 }
-
-
-
-
-
-

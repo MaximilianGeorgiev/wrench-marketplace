@@ -1,5 +1,6 @@
 package com.sampleproject.wrenchmarketplace.controllers;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sampleproject.wrenchmarketplace.dao.UserRepository;
 import com.sampleproject.wrenchmarketplace.entities.Listing;
@@ -42,7 +44,8 @@ public class ListingController {
 	}
 
 	@PostMapping("/saveNewListing")
-	public String saveNewListing(@ModelAttribute("listing") Listing theListing) {
+	public String saveNewListing(@ModelAttribute("listing") Listing theListing, @RequestParam("image") MultipartFile image)
+			throws IOException {
 		/*
 		 * Fetch current user, since it is another object from our User entity I search
 		 * in the database by name and then manually set the listing's seller to this
@@ -50,10 +53,11 @@ public class ListingController {
 		 */
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-
 		theListing.setSeller(currentUser);
+		
+		theListing.setImage(image.getBytes());
+		
 		listingService.save(theListing);
 
 		return "redirect:/";

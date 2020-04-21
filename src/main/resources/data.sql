@@ -7,18 +7,22 @@ CREATE SCHEMA LISTING;
 
 CREATE TABLE LISTING (
   Id INT PRIMARY KEY,
-  title VARCHAR(250) NOT NULL,
-  price DOUBLE(255) NOT NULL,
+  title VARCHAR(25) NOT NULL,
+  price DOUBLE NOT NULL,
   description VARCHAR(250) NOT NULL,
-  category VARCHAR(250),
-  seller_id INT
+  category VARCHAR(20),
+  seller_id INT,
+  image BLOB(10k) /* H2 data type for byte array */
 );
 
 CREATE TABLE USERS (
   Id INT PRIMARY KEY AUTO_INCREMENT,
-  username VARCHAR(250) NOT NULL,
+  username VARCHAR(25) NOT NULL,
   password VARCHAR(250) NOT NULL,
-  email VARCHAR(250) NOT NULL,
+  firstName VARCHAR(25) NOT NULL,
+  secondName VARCHAR(25) NOT NULL,
+  email VARCHAR(30) NOT NULL,
+  age INT NOT NULL,
   enabled tinyint(1) NOT NULL,
   listing_id INT
 );
@@ -26,8 +30,8 @@ CREATE TABLE USERS (
 ALTER TABLE LISTING ADD CONSTRAINT FK_LISTING_USERS FOREIGN KEY (seller_id) REFERENCES USERS(Id);
 ALTER TABLE USERS ADD CONSTRAINT FK_USERS_LISTING FOREIGN KEY (listing_id) REFERENCES LISTING(Id);
 
-INSERT INTO USERS (Id, username, password, email, enabled) VALUES
-(1, 'Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 'Gesh@gesh.ge', 1);
+INSERT INTO USERS (Id, username, password, firstName, secondName, email, age, enabled) VALUES
+(1, 'Gesh', '{bcrypt}$2a$04$eFytJDGtjbThXa80FyOOBuFdK2IwjyWefYkMpiBEFlpBwDH.5PM0K', 'Geshev', 'Gecuna', 'Gesh@gesh.ge', 30, 1);
 
 CREATE TABLE ROLE (
 Id INT PRIMARY KEY AUTO_INCREMENT,

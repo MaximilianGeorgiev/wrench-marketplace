@@ -46,7 +46,7 @@
 
 <body>
 <form action="#" th:action="@{/listings/saveNewListing}"
-						 th:object="${listing}" method="POST">
+						 th:object="${listing}" method="POST" enctype="multipart/form-data">
     <div class="page-wrapper bg-dark p-t-100 p-b-50">
         <div class="wrapper wrapper--w900">
             <div class="card card-6">
@@ -101,9 +101,9 @@
                         <div class="form-row">
                             <div class="name">Upload pictures</div>
                             <div class="value">
-                                <div class="input-group js-input-file">
-                                    <input class="input-file" type="file" name="picture" id="picture">
-                                    <label class="label--file" for="file">Choose file</label>
+                                <div class="form-group">
+                                	<label class="label--file" for="image">Choose file</label>
+                                    <input class="form-control-file" type="file" name="image" id="image">
                                     <span class="input-file__info">No file chosen</span>
                                 </div>
                                 <div class="label--desc">Upload your picture. Max file size 50 MB</div>

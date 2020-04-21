@@ -2,6 +2,8 @@ package com.sampleproject.wrenchmarketplace.entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,13 +21,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.sampleproject.wrenchmarketplace.validators.FieldMatch;
 import com.sampleproject.wrenchmarketplace.validators.ValidEmail;
 
 @Entity
 @Table(name = "USERS")
-@FieldMatch.List({
-		@FieldMatch(first = "password", second = "matchingPassword", message = "The password fields must match") })
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,11 +41,24 @@ public class User {
 	@Size(min = 1, message = "is required")
 	private String password;
 
+	@Column(name = "firstName")
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
+	private String firstName;
+
+	@Column(name = "secondName")
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
+	private String secondName;
+
 	@Column(name = "email")
 	@ValidEmail
 	@NotNull(message = "is required")
 	@Size(min = 1, message = "is required")
 	private String email;
+
+	@Column(name = "age")
+	private int age;
 
 	/*
 	 * It is a one to one mapping for testing purposes for now
@@ -64,12 +76,15 @@ public class User {
 	public User() {
 	}
 
-	public User(int id, String username, String password, String email) {
+	public User(int id, String username, String password, String firstName, String lastName, String email, int age) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
+		this.firstName = firstName;
+		this.secondName = lastName;
 		this.email = email;
 		this.listing = new ArrayList<Listing>();
+		this.age = age;
 		this.enabled = 1;
 	}
 
@@ -97,12 +112,38 @@ public class User {
 		this.password = password;
 	}
 
+	// no camel case since thyemelaf wants 100% match between field name and getter
+	// and setter names
+	public String getfirstName() {
+		return firstName;
+	}
+
+	public void setfirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getsecondName() {
+		return secondName;
+	}
+
+	public void setsecondName(String secondName) {
+		this.secondName = secondName;
+	}
+
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
 	}
 
 	public Collection<Role> getRoles() {
