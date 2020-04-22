@@ -4,15 +4,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -49,10 +54,9 @@ public class Listing {
 	 * @Column(name="category") private String category;
 	 */
 
-	@Lob
-	@Column(name = "image")
-
-	private byte[] image;
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "LISTING_IMAGE", joinColumns = @JoinColumn(name = "listing_Id"), inverseJoinColumns = @JoinColumn(name = "image_Id"))
+	private Collection<ImageRoute> imageAPIs;
 
 	public Listing() {
 	}
@@ -63,6 +67,7 @@ public class Listing {
 		this.price = price;
 		this.seller = seller;
 		this.description = description;
+		this.imageAPIs = new ArrayList<ImageRoute>();
 	}
 
 	// Seller is currently a string to test database as well as category
@@ -120,12 +125,12 @@ public class Listing {
 		this.description = description;
 	}
 
-	public byte[] getImage() {
-		return image;
+	public Collection<ImageRoute> getImageAPIs() {
+		return imageAPIs;
 	}
 
-	public void setImage(byte[] image) {
-		this.image = image;
+	public void setImageAPIs(Collection<ImageRoute> image) {
+		this.imageAPIs = image;
 	}
 
 	@Override
