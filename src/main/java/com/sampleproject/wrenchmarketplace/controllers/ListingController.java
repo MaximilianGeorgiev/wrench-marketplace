@@ -1,6 +1,7 @@
 package com.sampleproject.wrenchmarketplace.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public class ListingController {
 
 	@PostMapping("/saveNewListing")
 	public String saveNewListing(@ModelAttribute("listing") Listing theListing,
-			@RequestParam("files") MultipartFile files) throws IOException {
+			@RequestParam("files") MultipartFile[] files) throws IOException {
 		/*
 		 * Fetch current user, since it is another object from our User entity I search
 		 * in the database by name and then manually set the listing's seller to this
@@ -66,13 +67,16 @@ public class ListingController {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
 		theListing.setSeller(currentUser);
-
-		String uploadedFileRoute = imageController.handleFileUpload(files);
-
 		listingService.save(theListing);
+		
+		
+		for (MultipartFile file : files) {
+		String uploadedFileName = imageController.handleFileUpload(file);
 		imageService.insertIntoJoinedTable(theListing.getId(),
-				imageService.findByimageRoute(uploadedFileRoute).get().getId());
-
+				imageService.findByimageRoute(uploadedFileName).get().getId());
+		
+		}
+	
 		return "redirect:/";
 	}
 
@@ -83,12 +87,15 @@ public class ListingController {
 		/*
 		 * Looks in LISTING_IMAGE to find all IDs which are paired with this listingId
 		 * Then from the IMAGE table I fetch all the paths of these ImageIds Then bind
-		 * the data with the model so the pictures can be displayed
+		 * the data with the model so the pictures can be displayed in viewlisting
 		 */
-		List<ImageRoute> imgRoutes = imageService.findByListingIdInJoinedTable(listing.getId());
+		List<Integer> correspondingRouteIDs = imageService.findByListingIdInJoinedTable(listing.getId());
+		List<ImageRoute> imageRoutes = new ArrayList<>();
+		
+		correspondingRouteIDs.forEach(r -> imageRoutes.add(imageService.findById(r).get()));
 
 		theModel.addAttribute("listing", listing);
-		theModel.addAttribute("imageRoutes", imgRoutes);
+		theModel.addAttribute("imageRoutes", imageRoutes);
 
 		return "viewlisting";
 	}

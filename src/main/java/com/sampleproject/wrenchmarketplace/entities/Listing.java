@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class Listing {
 
 	@Id
-	// @GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "Id", nullable = false, unique = true) // if id is not set as not null throws exception since it is
 															// checked before a value is generated
 	private int id;

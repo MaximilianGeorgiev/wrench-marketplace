@@ -39,7 +39,7 @@ public class ImageServiceImpl implements ImageService {
 	}
 	
 	@Override
-	public List<ImageRoute> findByListingIdInJoinedTable (int listingId){
+	public List<Integer> findByListingIdInJoinedTable (int listingId){
 		return imageRepository.findByListingIdInJoinedTable(listingId);
 	}
 

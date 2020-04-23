@@ -60,9 +60,6 @@ public class User {
 	@Column(name = "age")
 	private int age;
 
-	/*
-	 * It is a one to one mapping for testing purposes for now
-	 */
 	@OneToMany(mappedBy = "seller")
 	private Collection<Listing> listing;
 

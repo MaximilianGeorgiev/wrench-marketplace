@@ -1,176 +1,177 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap-grid.css}" />
-		  
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap-grid.min.css}" />
+<link rel="stylesheet" th:href="@{/css/bootstrap-grid.css}" />
 
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap-reboot.css}" />
+<link rel="stylesheet" th:href="@{/css/bootstrap-grid.min.css}" />
 
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap-reboot.min.css}" />
-		  
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap.min.css}" />
-		  
-<link rel="stylesheet"
-		  th:href="@{/css/bootstrap.css}" />
-		  
-<link rel="stylesheet"
-		  th:href="@{/css/small-business.css}" />
-		  
+<link rel="stylesheet" th:href="@{/css/bootstrap-reboot.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap-reboot.min.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+
+<link rel="stylesheet" th:href="@{/css/bootstrap.css}" />
+
+<link rel="stylesheet" th:href="@{/css/small-business.css}" />
+
 
 <head>
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
 
-  <title>Wrench Marketplace</title>
+<title>Wrench Marketplace</title>
 
 </head>
 
 <body>
 
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">WRENCH MARKETPLACE</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home</a>
-          </li>
-          <div class="collapse navbar-collapse" sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
-          <li class="nav-item">
-            <a class="nav-link" th:href="@{/showLogin}">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" th:href="@{/users/createNewUser}">Register</a>
-          </li>
-          </div>
-          <div class="collapse navbar-collapse" sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Your listings</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Watched</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Settings</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Logout</a>
-          </li>
-          </div>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-        </ul>
-      </div>
-     </div>
-  </nav>
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+		<div class="container">
+			<a class="navbar-brand" href="#">WRENCH MARKETPLACE</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a class="nav-link" href="#">Home</a>
+					</li>
+					<div class="collapse navbar-collapse"
+						sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/showLogin}">Login</a></li>
+						<li class="nav-item"><a class="nav-link"
+							th:href="@{/users/createNewUser}">Register</a></li>
+					</div>
+					<div class="collapse navbar-collapse"
+						sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+						<li class="nav-item"><a class="nav-link" href="#">Your
+								listings</a></li>
+						<li class="nav-item"><a class="nav-link" href="#">Watched</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="#">Settings</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="#">Logout</a>
+						</li>
+					</div>
+					<li class="nav-item"><a class="nav-link" href="#">About</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-  <!-- Page Content -->
-  <div class="container">
+	<!-- Page Content -->
+	<div class="container">
 
-    <!-- Heading Row -->
-    <div class="row align-items-center my-5">
-      <div class="row">
-      <div class="col-md-15 mb-5">
-        <div class="card h-100" sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
-          <div class="card-body">
-            <h2 class="card-title" align="center">Dashboard</h2>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem magni quas ex numquam, maxime minus quam molestias corporis quod, ea minima accusamus.</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="btn btn-primary btn-sm">More Info</a>
-          </div>
-        </div>
-        <div class="row align-items-center my-5" sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
-        <div class="col-lg-7">
-        <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400" alt="">
-      </div>
-      <!-- /.col-lg-8 -->
-      <div class="col-lg-5">
-        <h1 class="font-weight-light">Wrench Marketplace</h1>
-        <p>Your local marketplace for car parts, tools and specialized accessories you cannot come accross easily!</p>
-        <a class="btn btn-primary" th:href="@{/users/createNewUser}">Sign up to list an item!</a>
-      </div>
-        </div>
-      </div>
-    
-    </div>
+		<!-- Heading Row -->
+		<div class="row align-items-center my-5">
+			<div class="input-group md-form form-sm form-2 pl-0">
+				<input class="form-control my-55 py-1 red-border" type="text"
+					placeholder="Search" aria-label="Search">
+				<div class="input-group-append">
+					<button  id="basic-text1"><i
+						class="fas fa-search text-grey" aria-hidden="true">Search</i></button>
+				</div>
+			</div>
 
-    <!-- /.row -->
-	
-	<div class="col-lg-8">
-	   <h1 class="font-weight-light" align="right">Today's VIP listings: </h1>
+			<div class="row"></div>
+			<div class="row align-items-center my-5"
+				sec:authorize="!hasAnyRole('ROLE_USER', 'ROLE_ADMIN')">
+				<div class="col-lg-7">
+					<img class="img-fluid rounded mb-4 mb-lg-0"
+						src="http://placehold.it/900x400" alt="">
+				</div>
+				<!-- /.col-lg-8 -->
+				<div class="col-lg-5">
+					<h1 class="font-weight-light">Wrench Marketplace</h1>
+					<p>Your local marketplace for car parts, tools and specialized
+						accessories you cannot come accross easily!</p>
+					<a class="btn btn-primary" th:href="@{/users/createNewUser}">Sign
+						up to list an item!</a>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
-    <!-- Content Row -->
-    <div class="row">
-      <div class="col-md-4 mb-5">
-        <div class="card h-100">
-          <div class="card-body">
-            <h2 class="card-title">Card One</h2>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem magni quas ex numquam, maxime minus quam molestias corporis quod, ea minima accusamus.</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="btn btn-primary btn-sm">More Info</a>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-md-4 -->
-      <div class="col-md-4 mb-5">
-        <div class="card h-100">
-          <div class="card-body">
-            <h2 class="card-title">Card Two</h2>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod tenetur ex natus at dolorem enim! Nesciunt pariatur voluptatem sunt quam eaque, vel, non in id dolore voluptates quos eligendi labore.</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="btn btn-primary btn-sm">More Info</a>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-md-4 -->
-      <div class="col-md-4 mb-5">
-        <div class="card h-100">
-          <div class="card-body">
-            <h2 class="card-title">Card Three</h2>
-            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Rem magni quas ex numquam, maxime minus quam molestias corporis quod, ea minima accusamus.</p>
-          </div>
-          <div class="card-footer">
-            <a href="#" class="btn btn-primary btn-sm">More Info</a>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-md-4 -->
+	<!-- /.row -->
 
-    </div>
-    <!-- /.row -->
+	<div class="col-lg-8">
+		<h1 class="font-weight-light" align="right">Today's VIP listings:
+		</h1>
+	</div>
 
-  </div>
-  <!-- /.container -->
+	<!-- Content Row -->
+	<div class="row">
+		<div class="col-md-4 mb-5">
+			<div class="card h-100">
+				<div class="card-body">
+					<h2 class="card-title">Card One</h2>
+					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
+						adipisicing elit. Rem magni quas ex numquam, maxime minus quam
+						molestias corporis quod, ea minima accusamus.</p>
+				</div>
+				<div class="card-footer">
+					<a href="#" class="btn btn-primary btn-sm">More Info</a>
+				</div>
+			</div>
+		</div>
+		<!-- /.col-md-4 -->
+		<div class="col-md-4 mb-5">
+			<div class="card h-100">
+				<div class="card-body">
+					<h2 class="card-title">Card Two</h2>
+					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
+						adipisicing elit. Quod tenetur ex natus at dolorem enim! Nesciunt
+						pariatur voluptatem sunt quam eaque, vel, non in id dolore
+						voluptates quos eligendi labore.</p>
+				</div>
+				<div class="card-footer">
+					<a href="#" class="btn btn-primary btn-sm">More Info</a>
+				</div>
+			</div>
+		</div>
+		<!-- /.col-md-4 -->
+		<div class="col-md-4 mb-5">
+			<div class="card h-100">
+				<div class="card-body">
+					<h2 class="card-title">Card Three</h2>
+					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
+						adipisicing elit. Rem magni quas ex numquam, maxime minus quam
+						molestias corporis quod, ea minima accusamus.</p>
+				</div>
+				<div class="card-footer">
+					<a href="#" class="btn btn-primary btn-sm">More Info</a>
+				</div>
+			</div>
+		</div>
+		<!-- /.col-md-4 -->
 
-  <!-- Footer -->
-  <footer class="py-5 bg-dark">
-    <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Your Website 2019</p>
-    </div>
-    <!-- /.container -->
-  </footer>
+	</div>
+	<!-- /.row -->
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	</div>
+	<!-- /.container -->
+
+	<!-- Footer -->
+	<footer class="py-5 bg-dark">
+		<div class="container">
+			<p class="m-0 text-center text-white">Copyright &copy; Your
+				Website 2019</p>
+		</div>
+		<!-- /.container -->
+	</footer>
+
+	<!-- Bootstrap core JavaScript -->
+	<script src="vendor/jquery/jquery.min.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

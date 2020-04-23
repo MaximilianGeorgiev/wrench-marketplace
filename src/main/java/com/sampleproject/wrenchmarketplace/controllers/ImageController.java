@@ -2,14 +2,7 @@ package com.sampleproject.wrenchmarketplace.controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,25 +18,32 @@ public class ImageController {
 	}
 
 	/*
-	 * Stores the file physically in /resources/uploads Pushes a new ImageRoute to
-	 * the database Will be troublesome when someone else downloads the project Will
-	 * fix one day
+	 * Stores the file physically in /resources/uploads Since a lot of browsers have
+	 * blocked loading resources from local files, the whole uploads directory has
+	 * been uploaded to a server (Web Server for Chrome extention). The file is
+	 * first saved with the absolute path to this folder but in the database the
+	 * server path is stored instead
+	 * 
+	 * Requires reconfiguring if someone else clones this project
 	 */
 
 	public String handleFileUpload(MultipartFile file) {
-		String absolutePathToUploads = "C:\\Repositories\\wrench-marketplace\\wrench-marketplace\\src\\main\\resources\\uploads\\";
-		String filePath = absolutePathToUploads + file.getOriginalFilename();
+		String absolutePathToUploads = "C://Repositories//wrench-marketplace//wrench-marketplace//src//main//resources//uploads//";
+		String filePath = absolutePathToUploads + "/" + file.getOriginalFilename();
+
+		String serverPathToUploads = "http://127.0.0.1:8033/";
+		String filePathOnServer = serverPathToUploads + file.getOriginalFilename();
 
 		try {
 			File dest = new File(filePath);
 			file.transferTo(dest);
-			imageService.save(new ImageRoute(0, filePath));
+			imageService.save(new ImageRoute(0, filePathOnServer));
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		return filePath;
+
+		return filePathOnServer;
 	}
 }
