@@ -70,11 +70,9 @@
 						<div class="form-row">
 							<div class="name">Category</div>
 							<div class="value">
-								<select class="form-control" id="category">
-									<option name="carparts" id="carparts">Car parts</option>
-									<option name="cartools" id="cartools">Car tools</option>
-									<option name="tyresrims" id="tyresrims">Tyres and rims</option>
-									<option name="other" id="other">Other</option>
+								<select class="form-control" id="category" th:field="*{category}">
+									<option th:each="category : ${categories}"
+										th:value="${category.name}" th:text="${category.name}"></option>
 								</select>
 							</div>
 						</div>

@@ -60,8 +60,10 @@ public class User {
 	@Column(name = "age")
 	private int age;
 
+	/*
 	@OneToMany(mappedBy = "seller")
 	private Collection<Listing> listing;
+	*/
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "USER_ROLE", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -80,7 +82,6 @@ public class User {
 		this.firstName = firstName;
 		this.secondName = lastName;
 		this.email = email;
-		this.listing = new ArrayList<Listing>();
 		this.age = age;
 		this.enabled = 1;
 	}
@@ -151,6 +152,7 @@ public class User {
 		this.roles = roles;
 	}
 
+	/*
 	public Collection<Listing> getListing() {
 		return listing;
 	}
@@ -158,6 +160,7 @@ public class User {
 	public void setListing(Collection<Listing> listing) {
 		this.listing = listing;
 	}
+	*/
 
 	public int getEnabled() {
 		return this.enabled;

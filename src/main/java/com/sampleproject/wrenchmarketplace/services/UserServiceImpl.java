@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.sampleproject.wrenchmarketplace.dao.RoleRepository;
@@ -26,6 +27,15 @@ public class UserServiceImpl implements UserService {
 		return BCrypt.hashpw(password, BCrypt.gensalt());
 	}
 
+	@Override
+	public void insertIntoJoinedTable(Integer user_Id, Integer listing_Id) {
+		userRepository.insertIntoJoinedTable(user_Id, listing_Id);
+	}
+	
+	@Override
+	public boolean findByListingIdInJoinedTable(Integer user_Id, Integer listing_Id) {
+		return userRepository.findByListingIdInJoinedTable(user_Id, listing_Id);
+	}
 
 	@Override
 	public List<User> findAll() {
