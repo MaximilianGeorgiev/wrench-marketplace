@@ -8,16 +8,20 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,8 +68,8 @@ public class ListingController {
 	}
 
 	@PostMapping("/saveNewListing")
-	public String saveNewListing(@ModelAttribute("listing") Listing theListing,
-			@RequestParam("files") MultipartFile[] files) throws IOException {
+	public String saveNewListing(@Valid @ModelAttribute("listing") Listing theListing,
+			@RequestParam("files") MultipartFile[] files, BindingResult theBindingResult) throws IOException {
 		/*
 		 * Fetch current user, since it is another object from our User entity I search
 		 * in the database by name and then manually set the listing's seller to this
@@ -73,6 +77,11 @@ public class ListingController {
 		 * into LISTING_IMAGE the following pair: {listing_id, image_id}
 		 * Also insert into USER_LISTING the following pair: {user_id, listing_id}
 		 */
+		
+		//Validates fields
+		 if (theBindingResult.hasErrors()){
+			 return "createNewListing";
+		 }
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
@@ -89,11 +98,21 @@ public class ListingController {
 		return "redirect:/";
 	}
 	
-	@PostMapping("/deleteListing")
-	public String deleteListing(@ModelAttribute("listing") Listing theListing) {
+	@GetMapping("/deleteListing/{Id}")
+	public String deleteListing(@PathVariable("Id") String passedId) {
 		
-		int listingId = theListing.getId();
+		Integer listingId = Integer.parseInt(passedId);
+	
+		/*
+		 *  Not sure whether this code is good practise, pretty sure it is not and will be addressed
+		 *  After the completion of the project
+		 *  First I delete the IDs present in USER_LISTING and LISTING_IMAGE 
+		 *  And then I delete it from LISTING as well, but I am pretty sure that cascading should delete 
+		 *  from the joined tables automatically, which doesn't happen in this case
+		 */
 		
+		listingService.deleteListingFromListingImageJoinedTable(listingId);
+		listingService.deleteListingFromUserListingJoinedTable(listingId);
 		listingService.deleteById(listingId);
 		
 		return "redirect:/";
@@ -101,7 +120,7 @@ public class ListingController {
 	
 
 	@GetMapping("/viewListing/{Id}")
-	public String viewListing(@PathVariable String Id, Model theModel) {
+	public String viewListing(@PathVariable("Id") String Id, Model theModel) {
 		Listing listing = listingService.findById(Integer.parseInt(Id)).get();
 		int listingID = listing.getId();
 
@@ -122,6 +141,15 @@ public class ListingController {
 		theModel.addAttribute("isOwner", loggedInUserOwnsListing(loggedInUser, listingID));
 
 		return "viewlisting";
+	}
+	
+	@GetMapping("/search")
+	public String search(@RequestParam(value = "searchWord") String searchWord, Model theModel){
+		List<Listing> listingsFound = listingService.findBytitle(searchWord);
+		
+		theModel.addAttribute("listings", listingsFound);
+		
+		return "search";
 	}
 	
 	

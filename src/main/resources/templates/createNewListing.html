@@ -45,6 +45,12 @@
 		<div class="page-wrapper bg-dark p-t-100 p-b-50">
 			<div class="wrapper wrapper--w900">
 				<div class="card card-6">
+				
+				<!-- Check for registration error provided by the constraint validators -->
+					<div th:if="${listingError}"
+						class="alert alert-danger col-xs-offset-1 col-xs-10">
+						<span th:text="${listingError}"></span>
+					</div>
 					<div class="card-heading">
 						<h2 class="title">Create new listing</h2>
 					</div>
@@ -52,6 +58,13 @@
 						<input type="hidden" th:field="*{Id}" />
 
 						<div class="form-row">
+						<div th:if="${#fields.hasErrors('title')}"
+								style="margin-bottom: 25px" class="text-danger">
+								<ul>
+									<li th:each="err : ${#fields.errors('title')}"
+										th:text="'Title ' + ${err}" />
+								</ul>
+							</div>
 							<div class="name">Title</div>
 							<div class="value">
 								<br> <br> <input class="input--style-6" type="text"
@@ -76,6 +89,13 @@
 								</select>
 							</div>
 						</div>
+						<div th:if="${#fields.hasErrors('description')}"
+								style="margin-bottom: 25px" class="text-danger">
+								<ul>
+									<li th:each="err : ${#fields.errors('description')}"
+										th:text="'Description ' + ${err}" />
+								</ul>
+							</div>
 						<div class="form-row">
 							<div class="name">Description</div>
 							<div class="value">

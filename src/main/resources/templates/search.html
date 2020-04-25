@@ -72,17 +72,14 @@
 	<div class="container">
 
 		<!-- Heading Row -->
-		<form th:action="@{/listings/search}" method="GET">
 		<div class="row align-items-center my-5">
 			<div class="input-group md-form form-sm form-2 pl-0">
-			
 				<input class="form-control my-55 py-1 red-border" type="text"
-					placeholder="Search" aria-label="Search" th:name="searchWord">
+					placeholder="Search" aria-label="Search">
 				<div class="input-group-append">
 					<button  id="basic-text1"><i
 						class="fas fa-search text-grey" aria-hidden="true">Search</i></button>
 				</div>
-				</form>
 			</div>
 
 			<div class="row"></div>
@@ -108,56 +105,24 @@
 	<!-- /.row -->
 
 	<div class="col-lg-8">
-		<h1 class="font-weight-light" align="right">Today's VIP listings:
+		<h1 class="font-weight-light" align="right">Search results: 
 		</h1>
 	</div>
 
 	<!-- Content Row -->
-	<div class="row">
+	<div class="row" th:each="listing: ${listings}">
 		<div class="col-md-4 mb-5">
 			<div class="card h-100">
 				<div class="card-body">
-					<h2 class="card-title">Card One</h2>
-					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
-						adipisicing elit. Rem magni quas ex numquam, maxime minus quam
-						molestias corporis quod, ea minima accusamus.</p>
+					
+					<h2 class="card-title" th:text = "${listing.title}"></h2>
+					<p class="card-text" th:text = "${listing.description}"></p>
 				</div>
 				<div class="card-footer">
-					<a href="#" class="btn btn-primary btn-sm">More Info</a>
+					<a th:href="@{/listings/viewListing/${listing.Id}}" class="btn btn-primary btn-sm">View full listing</a>
 				</div>
 			</div>
 		</div>
-		<!-- /.col-md-4 -->
-		<div class="col-md-4 mb-5">
-			<div class="card h-100">
-				<div class="card-body">
-					<h2 class="card-title">Card Two</h2>
-					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
-						adipisicing elit. Quod tenetur ex natus at dolorem enim! Nesciunt
-						pariatur voluptatem sunt quam eaque, vel, non in id dolore
-						voluptates quos eligendi labore.</p>
-				</div>
-				<div class="card-footer">
-					<a href="#" class="btn btn-primary btn-sm">More Info</a>
-				</div>
-			</div>
-		</div>
-		<!-- /.col-md-4 -->
-		<div class="col-md-4 mb-5">
-			<div class="card h-100">
-				<div class="card-body">
-					<h2 class="card-title">Card Three</h2>
-					<p class="card-text">Lorem ipsum dolor sit amet, consectetur
-						adipisicing elit. Rem magni quas ex numquam, maxime minus quam
-						molestias corporis quod, ea minima accusamus.</p>
-				</div>
-				<div class="card-footer">
-					<a href="#" class="btn btn-primary btn-sm">More Info</a>
-				</div>
-			</div>
-		</div>
-		<!-- /.col-md-4 -->
-
 	</div>
 	<!-- /.row -->
 

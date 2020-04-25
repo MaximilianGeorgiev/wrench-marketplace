@@ -5,6 +5,7 @@ import java.util.Optional;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.sampleproject.wrenchmarketplace.dao.ListingRepository;
@@ -26,6 +27,16 @@ public class ListingServiceImpl implements ListingService {
 	}
 	
 	@Override
+	public void deleteListingFromListingImageJoinedTable(Integer listing_ID) {
+			listingRepository.deleteListingFromListingImageJoinedTable(listing_ID);
+	}
+	
+	@Override
+	public void deleteListingFromUserListingJoinedTable(Integer listing_ID) {
+			listingRepository.deleteListingFromUserListingJoinedTable(listing_ID);
+	}
+	
+	@Override
 	public List<Listing> findAll() {
 		return listingRepository.findAll();
 	}
@@ -33,6 +44,11 @@ public class ListingServiceImpl implements ListingService {
 	@Override
 	public Optional<Listing> findById(int theId) {
 		return listingRepository.findById(theId);
+	}
+	
+	@Override
+	public List<Listing> findBytitle(String title){
+		return listingRepository.findBytitle(title);
 	}
 
 	@Override

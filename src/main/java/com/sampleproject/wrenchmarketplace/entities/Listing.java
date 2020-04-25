@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 //With JPA it automatically maps to @Table("listing")
 @Entity
@@ -27,12 +29,17 @@ public class Listing {
 	private int id;
 
 	@Column(name = "title")
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String title;
 
 	@Column(name = "price")
+	@NotNull(message = "is required")
 	private double price;
 
 	@Column(name = "description")
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is required")
 	private String description;
 
 	@Column(name = "category_name")
