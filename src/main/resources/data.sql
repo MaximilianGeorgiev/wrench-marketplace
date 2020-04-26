@@ -23,7 +23,8 @@ CREATE TABLE LISTING (
   title VARCHAR(25) NOT NULL,
   price DOUBLE NOT NULL,
   description VARCHAR(250) NOT NULL,
-  category_name VARCHAR(25)
+  category_name VARCHAR(25),
+  phone_number VARCHAR(25)
 );
 
 ALTER TABLE LISTING ADD FOREIGN KEY (category_name) REFERENCES CATEGORY(name) ON UPDATE CASCADE;

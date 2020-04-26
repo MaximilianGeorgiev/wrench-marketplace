@@ -3,7 +3,6 @@ package com.sampleproject.wrenchmarketplace.services;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -19,23 +18,42 @@ import com.sampleproject.wrenchmarketplace.entities.Listing;
 @Service
 public class ListingServiceImpl implements ListingService {
 	private ListingRepository listingRepository;
-	
-	
+
 	@Autowired
 	public ListingServiceImpl(ListingRepository listingRepository2) {
 		listingRepository = listingRepository2;
 	}
+
+	@Override
+	public void editTitle(Integer Id, String title) {
+		listingRepository.editTitle(Id, title);
+	}
+
+	@Override
+	public void editPrice(Integer Id, Double price) {
+		listingRepository.editPrice(Id, price);
+	}
+
+	@Override
+	public void editDescription(Integer Id, String description) {
+		listingRepository.editDescription(Id, description);
+	}
 	
+	@Override
+	public void editPhoneNumber(Integer Id, String phoneNumber) {
+		listingRepository.editPhoneNumber(Id, phoneNumber);
+	}
+
 	@Override
 	public void deleteListingFromListingImageJoinedTable(Integer listing_ID) {
-			listingRepository.deleteListingFromListingImageJoinedTable(listing_ID);
+		listingRepository.deleteListingFromListingImageJoinedTable(listing_ID);
 	}
-	
+
 	@Override
 	public void deleteListingFromUserListingJoinedTable(Integer listing_ID) {
-			listingRepository.deleteListingFromUserListingJoinedTable(listing_ID);
+		listingRepository.deleteListingFromUserListingJoinedTable(listing_ID);
 	}
-	
+
 	@Override
 	public List<Listing> findAll() {
 		return listingRepository.findAll();
@@ -45,9 +63,9 @@ public class ListingServiceImpl implements ListingService {
 	public Optional<Listing> findById(int theId) {
 		return listingRepository.findById(theId);
 	}
-	
+
 	@Override
-	public List<Listing> findBytitle(String title){
+	public List<Listing> findBytitle(String title) {
 		return listingRepository.findBytitle(title);
 	}
 

@@ -44,23 +44,30 @@ public class Listing {
 
 	@Column(name = "category_name")
 	private String category;
+	
+	@Column(name = "phone_number")
+	@NotNull(message = "is required")
+	@Size(min = 1, message = "is requred")
+	private String phoneNumber; // implement custom validator for a phone number: 08846321512 
 
 	public Listing() {
 	}
 
-	public Listing(int id, String title, double price, String description, String category) throws IOException {
+	public Listing(int id, String title, double price, String description, String category, String contactDetails) throws IOException {
 		this.id = id;
 		this.title = title;
 		this.price = price;
 		this.description = description;
 		this.category = category;
+		this.phoneNumber = contactDetails;
 	}
 
-	public Listing(String title, double price, String description, String category) {
+	public Listing(String title, double price, String description, String category, String contactDetails) {
 		this.title = title;
 		this.price = price;
 		this.description = description;
 		this.category = category;
+		this.phoneNumber = contactDetails;
 	}
 
 	public String getCategory() {
@@ -101,6 +108,14 @@ public class Listing {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public String getContactDetails() {
+		return phoneNumber;
+	}
+
+	public void setContactDetails(String contactDetails) {
+		this.phoneNumber = contactDetails;
 	}
 
 	@Override

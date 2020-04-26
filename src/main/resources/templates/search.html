@@ -105,13 +105,13 @@
 	<!-- /.row -->
 
 	<div class="col-lg-8">
-		<h1 class="font-weight-light" align="right">Search results: 
+		<h1 class="font-weight-light" align="right" th:text = "${listingsMatchesCount}">
 		</h1>
 	</div>
 
 	<!-- Content Row -->
-	<div class="row" th:each="listing: ${listings}">
-		<div class="col-md-4 mb-5">
+	<div class="row">
+		<div class="col-md-4 mb-5"  th:each="listing: ${listingsMatches}">
 			<div class="card h-100">
 				<div class="card-body">
 					
@@ -119,7 +119,7 @@
 					<p class="card-text" th:text = "${listing.description}"></p>
 				</div>
 				<div class="card-footer">
-					<a th:href="@{/listings/viewListing/${listing.Id}}" class="btn btn-primary btn-sm">View full listing</a>
+					<a th:href="@{/listings/viewListing/{id}(id=${listing.Id})}" class="btn btn-primary btn-sm">View full listing</a>
 				</div>
 			</div>
 		</div>

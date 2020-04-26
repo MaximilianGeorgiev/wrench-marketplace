@@ -88,12 +88,16 @@
 									contact details</a>
 							</h3>
 							<h3 class="list-group-item list-group-item-dark">
+									<a th:href="@{/listings/deleteListing/{id}(id=${listing.Id})}" class="list-group-item list-group-item-dark"
+									th:if="${isOwner}">Edit listing</a>
+							</h3> 
+							<h3 class="list-group-item list-group-item-dark">
 								<a href="#" class="list-group-item list-group-item-dark"
 									th:if="${!isOwner}">Report listing</a>
 									<a th:href="@{/listings/deleteListing/{id}(id=${listing.Id})}" class="list-group-item list-group-item-dark"
 									th:if="${isOwner}">Delete listing</a>
-									
 							</h3> 
+							
 							<h6 class="list-group-item list-group-item-dark"
 								th:text="${listing.description}"></h6>
 						</div>

@@ -25,6 +25,26 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
 	
 	@Transactional
 	@Modifying
+	@Query(value = "UPDATE LISTING l SET l.TITLE = :title WHERE l.Id = :Id", nativeQuery = true)
+	public void editTitle(@Param("Id")Integer Id, @Param("title") String title);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE LISTING l SET l.PRICE = :price WHERE l.Id = :Id", nativeQuery = true)
+	public void editPrice(@Param("Id")Integer Id, @Param("price") Double price);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE LISTING l SET l.DESCCRIPTION = :description WHERE l.Id = :Id", nativeQuery = true)
+	public void editDescription(@Param("Id")Integer Id, @Param("description") String description);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE LISTING l SET l.PHONE_NUMBER = :phoneNumber WHERE l.Id = :Id", nativeQuery = true)
+	public void editPhoneNumber(@Param("Id")Integer Id, @Param("phoneNumber") String phoneNumber);
+	
+	@Transactional
+	@Modifying
 	@Query(value = "DELETE FROM LISTING_IMAGE l WHERE l.listing_Id = :listing_ID", nativeQuery = true)
 	public void deleteListingFromListingImageJoinedTable(@Param("listing_ID") Integer listing_ID);
 	

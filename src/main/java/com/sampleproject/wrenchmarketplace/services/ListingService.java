@@ -11,6 +11,14 @@ import com.sampleproject.wrenchmarketplace.entities.Listing;
 
 public interface ListingService {
 	
+	public void editTitle(Integer Id, String title);
+	
+	public void editPrice(Integer Id, Double price);
+	
+	public void editDescription(Integer Id, String description);
+	
+	public void editPhoneNumber(Integer Id, String phoneNumber);
+	
 	public void deleteListingFromListingImageJoinedTable(Integer listing_ID);
 	
 	public void deleteListingFromUserListingJoinedTable(Integer listing_ID);
