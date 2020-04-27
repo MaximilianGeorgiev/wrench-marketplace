@@ -3,17 +3,14 @@ package com.sampleproject.wrenchmarketplace.controllers;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,12 +18,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.ArrayUtils;
 
-import com.sampleproject.wrenchmarketplace.dao.UserRepository;
 import com.sampleproject.wrenchmarketplace.entities.Category;
 import com.sampleproject.wrenchmarketplace.entities.ImageRoute;
 import com.sampleproject.wrenchmarketplace.entities.Listing;
@@ -123,10 +119,16 @@ public class ListingController {
 
 		userService.insertIntoJoinedTable(currentUser.getId(), theListing.getId());
 
+	
 		for (MultipartFile file : files) {
+			if (file.isEmpty()) {
+				return "redirect:/";
+			}
+			
 			String uploadedFileName = imageController.handleFileUpload(file);
+			
 			imageService.insertIntoJoinedTable(theListing.getId(),
-					imageService.findByimageRoute(uploadedFileName).get().getId());
+					imageService.findByImageRoute(uploadedFileName).get().getId());
 		}
 
 		return "redirect:/";
@@ -171,28 +173,32 @@ public class ListingController {
 	@GetMapping("/search")
 	public String search(@RequestParam(value = "searchWord") String searchWord, Model theModel) {
 		List<Listing> listingsFound = listingService.findAll();
-		List<Listing> listingsMatches = new ArrayList<>();
+		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
 
 		/*
-		 * Get all listings then in a new list change the title and the searchword to
-		 * lower case Compare them, and if there is a match add to listingsMatches Can
-		 * be improved with a regex pattern The count of the search will also be passed
-		 * and in the view a message like "x Results found" will be displayed
+		 * Get all the listings and iterate through them. If the search word is
+		 * contained in either the description or the title (case insensitive). Then
+		 * this is a valid match and will be added to the hashmap. There is a check
+		 * whether there any images present, and if there are not then attach the
+		 * "NO IMAGE FOUND" picture. I fetch the first picture and use it as a
+		 * thumbnail. The searching can be improved with a regex pattern later on
 		 */
 		listingsFound.forEach(l -> {
 			if (l.getTitle().toLowerCase().contains(searchWord.toLowerCase().trim())
 					|| l.getDescription().toLowerCase().contains(searchWord.toLowerCase().trim())) {
-				listingsMatches.add(l);
+
+				if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+					ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+					listingsAndThumbnails.put(l, thumbnail);
+				} else {
+					listingsAndThumbnails.put(l,
+							imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+				}
 			}
 		});
 
-		int listingsMatchesCount = listingsMatches.size();
-
-		System.out.println(listingsFound.size());
-		System.out.println(listingsMatchesCount);
-
-		theModel.addAttribute("listingsMatches", listingsMatches);
-		theModel.addAttribute("listingsMatchesCount", listingsMatchesCount);
+		theModel.addAttribute("listingsAndThumbmails", listingsAndThumbnails);
+		theModel.addAttribute("listingsMatchesCount", listingsAndThumbnails.size());
 
 		return "search";
 	}
@@ -226,7 +232,7 @@ public class ListingController {
 		for (MultipartFile file : files) {
 			String uploadedFileName = imageController.handleFileUpload(file);
 			imageService.insertIntoJoinedTable(theListing.getId(),
-					imageService.findByimageRoute(uploadedFileName).get().getId());
+					imageService.findByImageRoute(uploadedFileName).get().getId());
 		}
 
 		return "redirect:/";

@@ -29,11 +29,12 @@ public class ImageController {
 
 	public String handleFileUpload(MultipartFile file) {
 		String absolutePathToUploads = "C://Repositories//wrench-marketplace//wrench-marketplace//src//main//resources//uploads//";
-		String filePath = absolutePathToUploads + "/" + file.getOriginalFilename();
+		String filePath = absolutePathToUploads + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
+		//current time milis in order to avoid duplicate names
 		String serverPathToUploads = "http://127.0.0.1:8033/";
-		String filePathOnServer = serverPathToUploads + file.getOriginalFilename();
-
+		String filePathOnServer = serverPathToUploads + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+		
 		try {
 			File dest = new File(filePath);
 			file.transferTo(dest);

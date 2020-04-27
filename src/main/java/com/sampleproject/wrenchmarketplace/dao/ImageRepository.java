@@ -31,5 +31,5 @@ public interface ImageRepository extends JpaRepository<ImageRoute, Integer> {
 	public List<Integer> findByListingIdInJoinedTable(@Param("listing_Id") int listingId);
 
 
-	public Optional<ImageRoute> findByimageRoute(String imageRoute);
+	public Optional<ImageRoute> findByImageRoute(String imageRoute);
 }

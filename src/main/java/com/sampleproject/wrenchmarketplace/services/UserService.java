@@ -9,6 +9,16 @@ import com.sampleproject.wrenchmarketplace.entities.User;
 
 public interface UserService {
 	
+	public void editPassword(Integer Id, String password);
+	
+	public void editfirstName(Integer Id, String firstName);
+	
+	public void editsecodName(Integer Id, String secondName);
+	
+	public void editEmail(Integer Id, String email);
+	
+	public void editAge(Integer Id, Integer age);
+	
 	public void insertIntoJoinedTable(Integer user_Id, Integer listing_Id);
 	
 	public boolean findByListingIdInJoinedTable(Integer user_Id, Integer listing_Id);

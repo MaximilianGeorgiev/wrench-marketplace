@@ -109,13 +109,13 @@ public class Listing {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	public String getContactDetails() {
+
+	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 
-	public void setContactDetails(String contactDetails) {
-		this.phoneNumber = contactDetails;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 	@Override

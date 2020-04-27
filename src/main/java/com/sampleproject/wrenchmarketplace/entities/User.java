@@ -2,8 +2,6 @@ package com.sampleproject.wrenchmarketplace.entities;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,8 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -59,11 +55,6 @@ public class User {
 
 	@Column(name = "age")
 	private int age;
-
-	/*
-	@OneToMany(mappedBy = "seller")
-	private Collection<Listing> listing;
-	*/
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "USER_ROLE", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -151,16 +142,6 @@ public class User {
 	public void setRoles(Collection<Role> roles) {
 		this.roles = roles;
 	}
-
-	/*
-	public Collection<Listing> getListing() {
-		return listing;
-	}
-
-	public void setListing(Collection<Listing> listing) {
-		this.listing = listing;
-	}
-	*/
 
 	public int getEnabled() {
 		return this.enabled;

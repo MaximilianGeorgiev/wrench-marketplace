@@ -68,6 +68,8 @@ Id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 imageRoute VARCHAR(250)
 );
 
+INSERT INTO IMAGE (Id, imageRoute) VALUES (1, 'http://127.0.0.1:8033/no_image_found.jpg');
+
 CREATE TABLE LISTING_IMAGE (
 listing_Id INT NOT NULL,
 image_Id varchar(250) NOT NULL);

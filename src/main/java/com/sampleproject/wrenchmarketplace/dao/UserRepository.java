@@ -23,6 +23,31 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	
 	@Transactional
 	@Modifying
+	@Query(value = "UPDATE USERS u SET u.password = :password WHERE u.Id = :Id", nativeQuery = true)
+	public void editPassword(@Param("Id")Integer Id, @Param("password") String password);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE USERS u SET u.firstName = :firstName WHERE u.Id = :Id", nativeQuery = true)
+	public void editfirstName(@Param("Id")Integer Id, @Param("firstName") String firstName);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE USERS u SET u.secondName = :secondName WHERE u.Id = :Id", nativeQuery = true)
+	public void editsecondName(@Param("Id")Integer Id, @Param("secondName") String secondName);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE USERS u SET u.email = :email WHERE u.Id = :Id", nativeQuery = true)
+	public void editEmail(@Param("Id")Integer Id, @Param("email") String email);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE USERS u SET u.age = :age WHERE u.Id = :Id", nativeQuery = true)
+	public void editAge(@Param("Id")Integer Id, @Param("age") Integer age);
+	
+	@Transactional
+	@Modifying
 	@Query(value = "INSERT INTO USER_LISTING (user_Id, listing_Id) VALUES (:user_Id, :listing_Id);", nativeQuery = true)
 	public void insertIntoJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
 	

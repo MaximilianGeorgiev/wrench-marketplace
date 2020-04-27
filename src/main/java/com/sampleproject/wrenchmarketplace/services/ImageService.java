@@ -16,7 +16,7 @@ public interface ImageService {
 
 	public Optional<ImageRoute> findById(int theId);
 	
-	public Optional<ImageRoute> findByimageRoute(String imageRoute);
+	public Optional<ImageRoute> findByImageRoute(String imageRoute);
 	
 	public List<Integer> findByListingIdInJoinedTable (int listingId);
 

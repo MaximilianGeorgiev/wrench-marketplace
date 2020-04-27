@@ -34,8 +34,8 @@ public class ImageServiceImpl implements ImageService {
 	}
 	
 	@Override
-	public Optional<ImageRoute> findByimageRoute(String imageRoute){
-		return imageRepository.findByimageRoute(imageRoute);
+	public Optional<ImageRoute> findByImageRoute(String imageRoute){
+		return imageRepository.findByImageRoute(imageRoute);
 	}
 	
 	@Override
