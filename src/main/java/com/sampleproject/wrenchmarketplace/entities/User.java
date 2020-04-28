@@ -101,21 +101,19 @@ public class User {
 		this.password = password;
 	}
 
-	// no camel case since thyemelaf wants 100% match between field name and getter
-	// and setter names
-	public String getfirstName() {
+	public String getFirstName() {
 		return firstName;
 	}
 
-	public void setfirstName(String firstName) {
+	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
-	public String getsecondName() {
+	public String getSecondName() {
 		return secondName;
 	}
 
-	public void setsecondName(String secondName) {
+	public void setSecondName(String secondName) {
 		this.secondName = secondName;
 	}
 

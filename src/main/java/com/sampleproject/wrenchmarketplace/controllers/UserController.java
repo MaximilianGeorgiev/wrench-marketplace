@@ -1,11 +1,16 @@
 package com.sampleproject.wrenchmarketplace.controllers;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.validation.Valid;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,17 +21,41 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.sampleproject.wrenchmarketplace.entities.ImageRoute;
 import com.sampleproject.wrenchmarketplace.entities.Listing;
 import com.sampleproject.wrenchmarketplace.entities.User;
+import com.sampleproject.wrenchmarketplace.services.ImageService;
+import com.sampleproject.wrenchmarketplace.services.ListingService;
 import com.sampleproject.wrenchmarketplace.services.UserService;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
 	private UserService userService;
+	private ListingService listingService;
+	private ImageService imageService;
+	private ListingController listingController;
 
-	public UserController(UserService userService) {
+	public UserController(UserService userService, ListingService listingService,
+			ImageService imageService, ListingController listingController) {
 		this.userService = userService;
+		this.listingService = listingService;
+		this.listingController = listingController;
+	}
+	
+	
+	/* If the logged in user is the same one as the profile that is being viewed (in viewProfile())
+	 * Then the user will have the option in the thymeleaf view to edit their profile
+	 * Check ListingController.java for reference
+	 */
+	private boolean loggedInUserOwnsProfile(Authentication loggedInUser, int userID) {
+		String loggedInUserName = loggedInUser.getName();
+		int loggedInUserID = userService.findByusername(loggedInUserName).get().getId();
+
+		if (loggedInUserID == userID) {
+			return true;
+		}
+		return false;
 	}
 
 	@GetMapping("/createNewUser")
@@ -72,9 +101,36 @@ public class UserController {
 		}
 		return null;
 	}
+	
+	@GetMapping("/viewUser/{Id}")
+	public String viewUser(@PathVariable("Id") String Id, Model theModel) {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		int userID = Integer.parseInt(Id);
+		List<Listing> listingsByUser = listingService.findListingsByUserId(userID);
+		
+		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
+		
+		if (!listingsByUser.isEmpty()) {
+			for (Listing listing : listingsByUser) {
+				if (!listingController.getImageRoutesForListing(listing.getId()).isEmpty()) {
+					ImageRoute thumbnail = listingController.getImageRoutesForListing(listing.getId()).get(0);
+					listingsAndThumbnails.put(listing, thumbnail);
+				} else {
+					listingsAndThumbnails.put(listing,
+							imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+				}
+			}
+		}
+		
+		theModel.addAttribute("user", userService.findById(userID).get());
+		theModel.addAttribute("isOwner", loggedInUserOwnsProfile(loggedInUser, userID));
+		theModel.addAttribute("listingsAndThumbnails", listingsAndThumbnails);
+		
+		return "viewuser";
+	}
 
 	@GetMapping("/editUser/{Id}")
-	public String editListing(@PathVariable("Id") String Id, Model theModel) {
+	public String editUser(@PathVariable("Id") String Id, Model theModel) {
 		theModel.addAttribute("user", userService.findById(Integer.parseInt(Id)));
 
 		return "editUser";
@@ -90,12 +146,12 @@ public class UserController {
 			userService.editPassword(userID, editedUser.getPassword());
 		}
 
-		if (!editedUser.getfirstName().equals(savedUser.getfirstName())) {
-			userService.editfirstName(userID, editedUser.getfirstName());
+		if (!editedUser.getFirstName().equals(savedUser.getFirstName())) {
+			userService.editFirstName(userID, editedUser.getFirstName());
 		}
 
-		if (!editedUser.getsecondName().equals(savedUser.getsecondName())) {
-			userService.editsecodName(userID, editedUser.getsecondName());
+		if (!editedUser.getSecondName().equals(savedUser.getSecondName())) {
+			userService.editSecondName(userID, editedUser.getSecondName());
 		}
 
 		if (!editedUser.getEmail().equals(savedUser.getEmail())) {
@@ -106,7 +162,6 @@ public class UserController {
 			userService.editAge(userID, editedUser.getAge());
 		}
 
-		return "redirect:/";
+		return "redirect:/users/viewUser/" + String.valueOf(userID);
 	}
-
 }

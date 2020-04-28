@@ -29,6 +29,8 @@ public interface ListingService {
 	
 	public List<Listing> findBytitle(String title);
 	
+	public List<Listing> findListingsByUserId(Integer user_ID);
+	
 	public void save(Listing listing);
 	
 	public void deleteById(int theId);

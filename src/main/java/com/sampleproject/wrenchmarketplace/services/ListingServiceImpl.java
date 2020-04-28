@@ -1,5 +1,6 @@
 package com.sampleproject.wrenchmarketplace.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +68,18 @@ public class ListingServiceImpl implements ListingService {
 	@Override
 	public List<Listing> findBytitle(String title) {
 		return listingRepository.findBytitle(title);
+	}
+	
+	@Override
+	public List<Listing> findListingsByUserId(Integer user_ID){
+		List<Integer> listingIDsFound = listingRepository.findListingIDsByUserID(user_ID);
+		List<Listing> returnListings = new ArrayList<>();
+		
+		for (Integer ID : listingIDsFound) {
+			returnListings.add(listingRepository.findById(ID).get());
+		}
+		
+		return returnListings;
 	}
 
 	@Override

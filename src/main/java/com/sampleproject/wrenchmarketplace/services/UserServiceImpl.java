@@ -39,13 +39,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void editfirstName(Integer Id, String firstName) {
-		userRepository.editfirstName(Id, firstName);
+	public void editFirstName(Integer Id, String firstName) {
+		userRepository.editFirstName(Id, firstName);
 	}
 
 	@Override
-	public void editsecodName(Integer Id, String secondName) {
-		userRepository.editsecondName(Id, secondName);
+	public void editSecondName(Integer Id, String secondName) {
+		userRepository.editSecondName(Id, secondName);
 	}
 
 	@Override
@@ -59,8 +59,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void insertIntoJoinedTable(Integer user_Id, Integer listing_Id) {
-		userRepository.insertIntoJoinedTable(user_Id, listing_Id);
+	public void insertIntoUserListingJoinedTable(Integer user_Id, Integer listing_Id) {
+		userRepository.insertIntoUserListingJoinedTable(user_Id, listing_Id);
+	}
+	
+	@Override
+	public void insertIntoWatchListJoinedTable(Integer user_Id, Integer listing_Id) {
+		userRepository.insertIntoWatchListJoinedTable(user_Id, listing_Id);
 	}
 
 	@Override

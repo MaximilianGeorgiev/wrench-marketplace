@@ -72,7 +72,7 @@ public class ListingController {
 	 * Then from the IMAGE table I fetch all the paths of these ImageIds Then bind
 	 * the data with the model so the pictures can be displayed in viewlisting
 	 */
-	private List<ImageRoute> getImageRoutesForListing(int listingID) {
+	public List<ImageRoute> getImageRoutesForListing(int listingID) {
 		List<Integer> correspondingRouteIDs = imageService.findByListingIdInJoinedTable(listingID);
 		List<ImageRoute> imageRoutes = new ArrayList<>();
 
@@ -117,7 +117,7 @@ public class ListingController {
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
 		listingService.save(theListing);
 
-		userService.insertIntoJoinedTable(currentUser.getId(), theListing.getId());
+		userService.insertIntoUserListingJoinedTable(currentUser.getId(), theListing.getId());
 
 	
 		for (MultipartFile file : files) {
@@ -236,5 +236,16 @@ public class ListingController {
 		}
 
 		return "redirect:/";
+	}
+	
+	@GetMapping("/addToWatched/{Id}")
+	public String addToWatchList(@PathVariable("Id") String Id, Model theModel) {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		User currentUser = userService.findByusername(loggedInUser.getName()).get();
+		int listingId = Integer.parseInt(Id);
+		
+		userService.insertIntoWatchListJoinedTable(currentUser.getId(), listingId);
+		
+		return "redirect:/listings/viewListing/" + String.valueOf(listingId);
 	}
 }

@@ -29,12 +29,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE USERS u SET u.firstName = :firstName WHERE u.Id = :Id", nativeQuery = true)
-	public void editfirstName(@Param("Id")Integer Id, @Param("firstName") String firstName);
+	public void editFirstName(@Param("Id")Integer Id, @Param("firstName") String firstName);
 	
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE USERS u SET u.secondName = :secondName WHERE u.Id = :Id", nativeQuery = true)
-	public void editsecondName(@Param("Id")Integer Id, @Param("secondName") String secondName);
+	public void editSecondName(@Param("Id")Integer Id, @Param("secondName") String secondName);
 	
 	@Transactional
 	@Modifying
@@ -49,7 +49,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Transactional
 	@Modifying
 	@Query(value = "INSERT INTO USER_LISTING (user_Id, listing_Id) VALUES (:user_Id, :listing_Id);", nativeQuery = true)
-	public void insertIntoJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
+	public void insertIntoUserListingJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
+	
+	/* 
+	 * Didn't find a better way to make a watch list besides a joined table
+	 */
+	@Transactional
+	@Modifying
+	@Query(value = "INSERT INTO USER_WATCHEDLISTING (user_Id, listing_Id) VALUES (:user_Id, :listing_Id);", nativeQuery = true)
+	public void insertIntoWatchListJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
 	
 	/*
 	 * Returns one (true) if user_id == listing_id (should be one match only anyway) and returns 0 (false) if none is found

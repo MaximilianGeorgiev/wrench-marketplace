@@ -52,4 +52,8 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
 	@Modifying
 	@Query(value = "DELETE FROM USER_LISTING u WHERE u.listing_Id = :listing_ID", nativeQuery = true)
 	public void deleteListingFromUserListingJoinedTable(@Param("listing_ID") Integer listing_ID);
+	
+	// find all listings ids that correspond to a given user id (used by findListingsByUserId in the ListingService)
+	@Query(value = "SELECT * FROM USER_LISTING u WHERE u.user_Id = :user_ID", nativeQuery = true)
+	public List<Integer> findListingIDsByUserID(@Param("user_ID") Integer user_ID);
 }
