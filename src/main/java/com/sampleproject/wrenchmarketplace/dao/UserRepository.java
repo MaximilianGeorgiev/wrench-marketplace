@@ -59,11 +59,19 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "INSERT INTO USER_WATCHEDLISTING (user_Id, listing_Id) VALUES (:user_Id, :listing_Id);", nativeQuery = true)
 	public void insertIntoWatchListJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
 	
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE FROM USER_WATCHEDLISTING u WHERE u.user_Id = :user_Id", nativeQuery = true)
+	public void deleteFromWatchListJoinedTable(@Param("user_Id") Integer user_Id);
+	
 	/*
 	 * Returns one (true) if user_id == listing_id (should be one match only anyway) and returns 0 (false) if none is found
 	 */
 	@Query(value = "SELECT CAST(COUNT(*) AS BIT) FROM USER_LISTING u WHERE u.user_Id = :user_Id AND u.listing_Id = :listing_Id", nativeQuery = true)
 	public boolean findByListingIdInJoinedTable(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
+	
+	@Query(value = "SELECT CAST(COUNT(*) AS BIT) FROM USER_WATCHEDLISTING u WHERE u.user_Id = :user_Id AND u.listing_Id = :listing_Id", nativeQuery = true)
+	public boolean isUserWatchingListingId(@Param("user_Id") Integer user_Id, @Param("listing_Id") Integer listing_Id);
 	
 	Optional<User> findByusername(String username);
 	

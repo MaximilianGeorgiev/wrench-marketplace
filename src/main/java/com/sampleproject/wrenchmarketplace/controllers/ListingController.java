@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.util.ArrayUtils;
 
 import com.sampleproject.wrenchmarketplace.entities.Category;
 import com.sampleproject.wrenchmarketplace.entities.ImageRoute;
@@ -48,6 +47,14 @@ public class ListingController {
 		this.imageService = imageService;
 		this.imageController = imageController;
 		this.categoryService = categoryService;
+	}
+
+	private boolean isUserLoggedIn(Authentication loggedInUser) {
+		if (loggedInUser.getPrincipal().equals("anonymousUser")) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/*
@@ -81,6 +88,55 @@ public class ListingController {
 		return imageRoutes;
 	}
 
+	public HashMap<Listing, ImageRoute> searchListingByCriteria(List<Listing> allListings, String criteria,
+			String searchWord) {
+		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
+
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+
+		if (criteria.equalsIgnoreCase("standard")) {
+			allListings.forEach(l -> {
+				if (l.getTitle().toLowerCase().contains(searchWord.toLowerCase().trim())
+						|| l.getDescription().toLowerCase().contains(searchWord.toLowerCase().trim())) {
+
+					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+						ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+						listingsAndThumbnails.put(l, thumbnail);
+					} else {
+						listingsAndThumbnails.put(l,
+								imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+					}
+				}
+			});
+		} else if (criteria.equalsIgnoreCase("userlistings")) {
+			allListings.forEach(l -> {
+				if (loggedInUserOwnsListing(loggedInUser, l.getId())) {
+					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+						ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+						listingsAndThumbnails.put(l, thumbnail);
+					} else {
+						listingsAndThumbnails.put(l,
+								imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+					}
+				}
+			});
+		} else if (criteria.equalsIgnoreCase("category")) {
+			allListings.forEach(l -> {
+				if (l.getCategory().equalsIgnoreCase(searchWord)) {
+					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+						ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+						listingsAndThumbnails.put(l, thumbnail);
+					} else {
+						listingsAndThumbnails.put(l,
+								imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+					}
+				}
+			});
+		}
+
+		return listingsAndThumbnails;
+	}
+
 	@GetMapping("/createNewListing")
 	public String createNewListing(Model theModel) {
 		Listing listing = new Listing();
@@ -103,8 +159,8 @@ public class ListingController {
 		/*
 		 * Fetch current user, since it is another object from our User entity I search
 		 * in the database by name and then manually set the listing's seller to this
-		 * User Upload file, insert into IMAGE database a new ImageRoute Then insert
-		 * into LISTING_IMAGE the following pair: {listing_id, image_id} Also insert
+		 * User Upload file, insert into IMAGE database a new ImageRoute. Then insert
+		 * into LISTING_IMAGE the following pair: {listing_id, image_id}. Also insert
 		 * into USER_LISTING the following pair: {user_id, listing_id}
 		 */
 
@@ -119,14 +175,13 @@ public class ListingController {
 
 		userService.insertIntoUserListingJoinedTable(currentUser.getId(), theListing.getId());
 
-	
 		for (MultipartFile file : files) {
 			if (file.isEmpty()) {
 				return "redirect:/";
 			}
-			
+
 			String uploadedFileName = imageController.handleFileUpload(file);
-			
+
 			imageService.insertIntoJoinedTable(theListing.getId(),
 					imageService.findByImageRoute(uploadedFileName).get().getId());
 		}
@@ -141,8 +196,8 @@ public class ListingController {
 
 		/*
 		 * Not sure whether this code is good practise, pretty sure it is not and will
-		 * be addressed After the completion of the project First I delete the IDs
-		 * present in USER_LISTING and LISTING_IMAGE And then I delete it from LISTING
+		 * be addressed After the completion of the project. First I delete the IDs
+		 * present in USER_LISTING and LISTING_IMAGE. And then I delete it from LISTING
 		 * as well, but I am pretty sure that cascading should delete from the joined
 		 * tables automatically, which doesn't happen in this case
 		 */
@@ -162,18 +217,61 @@ public class ListingController {
 		List<ImageRoute> imageRoutes = getImageRoutesForListing(listingID);
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		int userID = userService.findByusername(loggedInUser.getName()).get().getId();
+
+		/*
+		 * Why is this so spaghetti code?
+		 * 
+		 * /@watch below inserts into USER_WATCHEDLISTING table a {USER_ID, LISTING_ID}
+		 * pair Then it redirects back to this @/viewListing page Here I query the table
+		 * to check if this listing is in the user's watched list, they will get the
+		 * option to remove from watchlist. Basically a two way toggle: 1) to remove the
+		 * listing from watchling 2) to add to watchlist
+		 *
+		 * @/viewListing is loaded before /@watch list and the isWatched variable will
+		 * be null if it is not handled here. That's why it's not set in /@watch
+		 */
+		if (userService.isUserWatchingListingId(userID, listingID)) {
+			theModel.addAttribute("isWatched", true);
+		} else {
+			theModel.addAttribute("isWatched", false);
+		}
 
 		theModel.addAttribute("listing", listing);
 		theModel.addAttribute("imageRoutes", imageRoutes);
+		theModel.addAttribute("isUserLoggedIn", isUserLoggedIn(loggedInUser));
 		theModel.addAttribute("isOwner", loggedInUserOwnsListing(loggedInUser, listingID));
 
 		return "viewlisting";
 	}
 
-	@GetMapping("/search")
-	public String search(@RequestParam(value = "searchWord") String searchWord, Model theModel) {
+	@GetMapping("/watch/{Id}")
+	public String toggleWatchList(@PathVariable("Id") String Id, Model theModel) {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		User currentUser = userService.findByusername(loggedInUser.getName()).get();
+		int listingId = Integer.parseInt(Id);
+		int userId = currentUser.getId();
+
+		/* if it's watched then remove from watch list */
+		if (userService.isUserWatchingListingId(userId, listingId)) {
+			userService.deleteFromWatchListJoinedTable(currentUser.getId());
+		} else {
+			/*
+			 * The user definitely exists, otherwise they wouldn't have a button
+			 * to @/addToWatched (It's handled in the viewlisting.html) Add to
+			 * USER_WATCHLING JOIN TABLE
+			 */
+			userService.insertIntoWatchListJoinedTable(currentUser.getId(), listingId);
+		}
+
+		return "redirect:/listings/viewListing/" + String.valueOf(listingId);
+	}
+
+	@GetMapping("/search/{type}/{searchWord}")
+	public String search(@PathVariable("type") String type, @PathVariable("searchWord") String searchWord, 
+			 Model theModel) {
 		List<Listing> listingsFound = listingService.findAll();
-		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
+		HashMap<Listing, ImageRoute> listingsAndThumbnails = searchListingByCriteria(listingsFound, type, searchWord);
 
 		/*
 		 * Get all the listings and iterate through them. If the search word is
@@ -183,21 +281,8 @@ public class ListingController {
 		 * "NO IMAGE FOUND" picture. I fetch the first picture and use it as a
 		 * thumbnail. The searching can be improved with a regex pattern later on
 		 */
-		listingsFound.forEach(l -> {
-			if (l.getTitle().toLowerCase().contains(searchWord.toLowerCase().trim())
-					|| l.getDescription().toLowerCase().contains(searchWord.toLowerCase().trim())) {
-
-				if (!getImageRoutesForListing(l.getId()).isEmpty()) {
-					ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
-					listingsAndThumbnails.put(l, thumbnail);
-				} else {
-					listingsAndThumbnails.put(l,
-							imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
-				}
-			}
-		});
-
-		theModel.addAttribute("listingsAndThumbmails", listingsAndThumbnails);
+	
+		theModel.addAttribute("listingsAndThumbnails", listingsAndThumbnails);
 		theModel.addAttribute("listingsMatchesCount", listingsAndThumbnails.size());
 
 		return "search";
@@ -236,16 +321,5 @@ public class ListingController {
 		}
 
 		return "redirect:/";
-	}
-	
-	@GetMapping("/addToWatched/{Id}")
-	public String addToWatchList(@PathVariable("Id") String Id, Model theModel) {
-		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-		int listingId = Integer.parseInt(Id);
-		
-		userService.insertIntoWatchListJoinedTable(currentUser.getId(), listingId);
-		
-		return "redirect:/listings/viewListing/" + String.valueOf(listingId);
 	}
 }

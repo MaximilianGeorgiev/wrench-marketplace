@@ -72,6 +72,16 @@ public class UserServiceImpl implements UserService {
 	public boolean findByListingIdInJoinedTable(Integer user_Id, Integer listing_Id) {
 		return userRepository.findByListingIdInJoinedTable(user_Id, listing_Id);
 	}
+	
+	@Override
+	public boolean isUserWatchingListingId(Integer user_Id, Integer listing_Id) {
+		return userRepository.isUserWatchingListingId(user_Id, listing_Id);
+	}
+	
+	public void deleteFromWatchListJoinedTable(Integer user_Id) {
+		userRepository.deleteFromWatchListJoinedTable(user_Id);
+	}
+
 
 	@Override
 	public List<User> findAll() {

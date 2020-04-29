@@ -24,6 +24,10 @@ public interface UserService {
 	public void insertIntoWatchListJoinedTable(Integer user_Id, Integer listing_Id);
 	
 	public boolean findByListingIdInJoinedTable(Integer user_Id, Integer listing_Id);
+	
+	public boolean isUserWatchingListingId(Integer user_Id, Integer listing_Id);
+	
+	public void deleteFromWatchListJoinedTable(Integer user_Id);
 
 	public List<User> findAll();
 	
