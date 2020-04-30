@@ -66,12 +66,31 @@ public class ListingController {
 	 */
 	private boolean loggedInUserOwnsListing(Authentication loggedInUser, int listingID) {
 		String loggedInUserName = loggedInUser.getName();
+		
+		if (!isUserLoggedIn(loggedInUser)) {
+			return false;
+		}
+		
 		int loggedInUserID = userService.findByusername(loggedInUserName).get().getId();
 
 		if (userService.findByListingIdInJoinedTable(loggedInUserID, listingID)) {
 			return true;
 		}
 		return false;
+	}
+	
+	/* Often used function, the user model is required for the nav bar of every single html view */
+	private User retrieveUserModel() {	
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		User user = new User();
+		
+		if (!isUserLoggedIn(loggedInUser)) {
+			return new User();
+		}
+		
+		user = userService.findByusername(loggedInUser.getName()).get();
+		
+		return user;
 	}
 
 	/*
@@ -93,6 +112,16 @@ public class ListingController {
 		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		int userID = userService.findByusername(loggedInUser.getName()).get().getId();
+		
+		/*
+		 * Get all the listings and iterate through them. If the search word is
+		 * contained in either the description or the title (case insensitive). Then
+		 * this is a valid match and will be added to the hashmap. There is a check
+		 * whether there any images present, and if there are not then attach the
+		 * "NO IMAGE FOUND" picture. I fetch the first picture and use it as a
+		 * thumbnail. The searching can be improved with a regex pattern later on
+		 */
 
 		if (criteria.equalsIgnoreCase("standard")) {
 			allListings.forEach(l -> {
@@ -108,7 +137,13 @@ public class ListingController {
 					}
 				}
 			});
-		} else if (criteria.equalsIgnoreCase("userlistings")) {
+		}
+
+		/*
+		 * If in USER_LISTING there is a valid pair of the logged in User ID and the
+		 * listing ID then the user owns the listing and will be added to the hashmap
+		 */
+		else if (criteria.equalsIgnoreCase("userlistings")) {
 			allListings.forEach(l -> {
 				if (loggedInUserOwnsListing(loggedInUser, l.getId())) {
 					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
@@ -132,6 +167,18 @@ public class ListingController {
 					}
 				}
 			});
+		} else if (criteria.equalsIgnoreCase("watched")) {
+			allListings.forEach(l -> {
+				if (userService.isUserWatchingListingId(userID, l.getId())) {
+					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+						ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+						listingsAndThumbnails.put(l, thumbnail);
+					} else {
+						listingsAndThumbnails.put(l,
+								imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+					}
+				}
+			});
 		}
 
 		return listingsAndThumbnails;
@@ -141,6 +188,7 @@ public class ListingController {
 	public String createNewListing(Model theModel) {
 		Listing listing = new Listing();
 		List<Category> categories = categoryService.findAll();
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 
 		/*
 		 * Prepopulate category options by loading them from db and passing the model to
@@ -149,6 +197,7 @@ public class ListingController {
 
 		theModel.addAttribute("listing", listing);
 		theModel.addAttribute("categories", categories);
+		theModel.addAttribute("user", retrieveUserModel());
 
 		return "createNewListing";
 	}
@@ -189,8 +238,8 @@ public class ListingController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/deleteListing/{Id}")
-	public String deleteListing(@PathVariable("Id") String passedId) {
+	@PostMapping("/deleteListing")
+	public String deleteListing(@RequestParam("Id") String passedId) {
 
 		Integer listingId = Integer.parseInt(passedId);
 
@@ -213,12 +262,14 @@ public class ListingController {
 	public String viewListing(@PathVariable("Id") String Id, Model theModel) {
 		Listing listing = listingService.findById(Integer.parseInt(Id)).get();
 		int listingID = listing.getId();
+		boolean isUserLoggedIn = false;
 
 		List<ImageRoute> imageRoutes = getImageRoutesForListing(listingID);
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		int userID = userService.findByusername(loggedInUser.getName()).get().getId();
-
+	
+		isUserLoggedIn = (isUserLoggedIn(loggedInUser)) ? true : false;
+	
 		/*
 		 * Why is this so spaghetti code?
 		 * 
@@ -231,22 +282,30 @@ public class ListingController {
 		 * @/viewListing is loaded before /@watch list and the isWatched variable will
 		 * be null if it is not handled here. That's why it's not set in /@watch
 		 */
-		if (userService.isUserWatchingListingId(userID, listingID)) {
-			theModel.addAttribute("isWatched", true);
-		} else {
+		if (isUserLoggedIn) {
+			int userID = userService.findByusername(loggedInUser.getName()).get().getId();
+			
+			if (userService.isUserWatchingListingId(userID, listingID)) {
+				theModel.addAttribute("isWatched", true);
+			} else {
+				theModel.addAttribute("isWatched", false);
+			}
+		}
+		 else {
 			theModel.addAttribute("isWatched", false);
 		}
 
 		theModel.addAttribute("listing", listing);
 		theModel.addAttribute("imageRoutes", imageRoutes);
-		theModel.addAttribute("isUserLoggedIn", isUserLoggedIn(loggedInUser));
+		theModel.addAttribute("isUserLoggedIn", isUserLoggedIn);
 		theModel.addAttribute("isOwner", loggedInUserOwnsListing(loggedInUser, listingID));
+		theModel.addAttribute("user", retrieveUserModel());
 
 		return "viewlisting";
 	}
 
-	@GetMapping("/watch/{Id}")
-	public String toggleWatchList(@PathVariable("Id") String Id, Model theModel) {
+	@PostMapping("/watch")
+	public String toggleWatchList(@RequestParam("Id") String Id, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
 		int listingId = Integer.parseInt(Id);
@@ -258,7 +317,7 @@ public class ListingController {
 		} else {
 			/*
 			 * The user definitely exists, otherwise they wouldn't have a button
-			 * to @/addToWatched (It's handled in the viewlisting.html) Add to
+			 * to @/watch (It's handled in the viewlisting.html) Add to
 			 * USER_WATCHLING JOIN TABLE
 			 */
 			userService.insertIntoWatchListJoinedTable(currentUser.getId(), listingId);
@@ -266,32 +325,34 @@ public class ListingController {
 
 		return "redirect:/listings/viewListing/" + String.valueOf(listingId);
 	}
+	
+	/*
+	 * The search view is the same for: using the search bar, clicking on "Your listings", searching by category from the index
+	 * and also loading up your watched list. So why not have one search function for all of them?
+	 * POST mapping since the GET mapping appends the search word differently when the field is plain text and when the field is 
+	 * a bean property and makes it hard to fetch as a PathVariable that's why it is posted as a requestparam.
+	 * The searchListingByCriteria function will return all the listings necessary to display, along with their image routes 
+	 * and this will be bound with the model.
+	 */
 
-	@GetMapping("/search/{type}/{searchWord}")
-	public String search(@PathVariable("type") String type, @PathVariable("searchWord") String searchWord, 
-			 Model theModel) {
+	@PostMapping("/search/{type}")
+	public String search(@PathVariable("type") String type, @RequestParam("searchWord") String searchWord,
+			Model theModel) {
 		List<Listing> listingsFound = listingService.findAll();
 		HashMap<Listing, ImageRoute> listingsAndThumbnails = searchListingByCriteria(listingsFound, type, searchWord);
 
-		/*
-		 * Get all the listings and iterate through them. If the search word is
-		 * contained in either the description or the title (case insensitive). Then
-		 * this is a valid match and will be added to the hashmap. There is a check
-		 * whether there any images present, and if there are not then attach the
-		 * "NO IMAGE FOUND" picture. I fetch the first picture and use it as a
-		 * thumbnail. The searching can be improved with a regex pattern later on
-		 */
-	
 		theModel.addAttribute("listingsAndThumbnails", listingsAndThumbnails);
 		theModel.addAttribute("listingsMatchesCount", listingsAndThumbnails.size());
+		theModel.addAttribute("user", retrieveUserModel());
 
 		return "search";
 	}
 
-	@GetMapping("/edit/{Id}")
-	public String editListing(@PathVariable("Id") String Id, Model theModel) {
+	@PostMapping("/edit")
+	public String editListing(@RequestParam("Id") String Id, Model theModel) {
 		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(Id)).get());
 		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(Id)));
+		theModel.addAttribute("user", retrieveUserModel());
 
 		return "editListing";
 	}

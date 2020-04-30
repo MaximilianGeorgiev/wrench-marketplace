@@ -102,33 +102,17 @@ public class UserController {
 		return null;
 	}
 	
-	@GetMapping("/viewUser/{Id}")
-	public String viewUser(@PathVariable("Id") String Id, Model theModel) {
+	@PostMapping("/viewUser")
+	public String viewUser(@RequestParam("Id") String Id, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		int userID = Integer.parseInt(Id);
-		List<Listing> listingsByUser = listingService.findListingsByUserId(userID);
-		
-		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
-		
-		if (!listingsByUser.isEmpty()) {
-			for (Listing listing : listingsByUser) {
-				if (!listingController.getImageRoutesForListing(listing.getId()).isEmpty()) {
-					ImageRoute thumbnail = listingController.getImageRoutesForListing(listing.getId()).get(0);
-					listingsAndThumbnails.put(listing, thumbnail);
-				} else {
-					listingsAndThumbnails.put(listing,
-							imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
-				}
-			}
-		}
 		
 		theModel.addAttribute("user", userService.findById(userID).get());
 		theModel.addAttribute("isOwner", loggedInUserOwnsProfile(loggedInUser, userID));
-		theModel.addAttribute("listingsAndThumbnails", listingsAndThumbnails);
 		
 		return "viewuser";
 	}
-
+	
 	@GetMapping("/editUser/{Id}")
 	public String editUser(@PathVariable("Id") String Id, Model theModel) {
 		theModel.addAttribute("user", userService.findById(Integer.parseInt(Id)));
