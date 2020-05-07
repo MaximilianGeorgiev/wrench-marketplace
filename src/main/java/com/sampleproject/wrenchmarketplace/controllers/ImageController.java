@@ -2,6 +2,7 @@ package com.sampleproject.wrenchmarketplace.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,11 +32,20 @@ public class ImageController {
 		String absolutePathToUploads = "C://Repositories//wrench-marketplace//wrench-marketplace//src//main//resources//uploads//";
 		String filePath = absolutePathToUploads + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-		//current time milis in order to avoid duplicate names
+		// current time milis in order to avoid duplicate names
 		String serverPathToUploads = "http://127.0.0.1:8033/";
 		String filePathOnServer = serverPathToUploads + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-		
+
 		try {
+			String fileExtension = file.getOriginalFilename()
+					.substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+
+			/* check if extension is a valid image file, otherwise throw exception */
+			if (!(fileExtension.equals("png") || fileExtension.equals("jpg") || fileExtension.equals("jpeg"))
+					|| fileExtension.equals("bmp")) {
+				throw new IllegalStateException();
+			}
+
 			File dest = new File(filePath);
 			file.transferTo(dest);
 			imageService.save(new ImageRoute(0, filePathOnServer));

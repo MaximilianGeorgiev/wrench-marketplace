@@ -32,15 +32,9 @@ import com.sampleproject.wrenchmarketplace.services.UserService;
 @RequestMapping("/users")
 public class UserController {
 	private UserService userService;
-	private ListingService listingService;
-	private ImageService imageService;
-	private ListingController listingController;
 
-	public UserController(UserService userService, ListingService listingService,
-			ImageService imageService, ListingController listingController) {
+	public UserController(UserService userService, ImageService imageService) {
 		this.userService = userService;
-		this.listingService = listingService;
-		this.listingController = listingController;
 	}
 	
 	
@@ -93,15 +87,6 @@ public class UserController {
 		return "redirect:/";
 	}
 
-	public User verifyLogin(String username) {
-		Optional<User> user = userService.findByusername(username);
-
-		if (user.isPresent()) {
-			return user.get();
-		}
-		return null;
-	}
-	
 	@PostMapping("/viewUser")
 	public String viewUser(@RequestParam("Id") String Id, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();

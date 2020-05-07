@@ -1,6 +1,5 @@
 package com.sampleproject.wrenchmarketplace.controllers;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -10,29 +9,24 @@ import com.sampleproject.wrenchmarketplace.services.UserService;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/")
 @Controller
 public class MainController {
-	private UserController userController;
 	private UserService userService;
 	private CategoryService categoryService;
 
-	public MainController(UserController userController, UserService userService, CategoryService categoryService) {
-		this.userController = userController;
+	public MainController(UserService userService, CategoryService categoryService) {
 		this.userService = userService;
 		this.categoryService = categoryService;
 	}
 
 	@GetMapping("/")
 	public String showMainPage(Model theModel) {
-
 		/*
 		 * get authentication object then get the username of the logged in user and
-		 * search in the database for an User object with the same username A user is
+		 * search in the database for an User object with the same username. A user is
 		 * passed to the model as it is needed for various api calls for example if the
 		 * client clicks on settings it will take them to /users/edituser/{Id} which is
 		 * the Id of the logged in user
@@ -55,27 +49,4 @@ public class MainController {
 		return "login";
 	}
 
-	@PostMapping("/verifyLogin")
-	public String verifyLogin(@RequestParam(name = "username") String username,
-			@RequestParam(name = "password") String password) {
-		/*
-		 * I am not passing a user object with thymeleaf but rather plain string from
-		 * the html form I check with the controller if there is such an username in the
-		 * database and if there is such we will check if the encrypted password in the
-		 * db matches the one in the html form and then proceed to login if not redirect
-		 * to login page again
-		 */
-
-		User user = userController.verifyLogin(username);
-
-		if (user == null) {
-			return "redirect:/showLogin";
-		}
-
-		if (!BCrypt.checkpw(password, user.getPassword())) {
-			return "redirect:/showLogin";
-		}
-
-		return "redirect:/";
-	}
 }

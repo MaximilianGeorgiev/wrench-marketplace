@@ -33,7 +33,9 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().antMatchers("/listings/createNewListing/").hasAnyRole("USER", "ADMIN")
 				.antMatchers("/listings/saveNewListing/").hasAnyRole("USER", "ADMIN")
+				.antMatchers("/listings/editListing/").hasAnyRole("USER", "ADMIN")
 				.antMatchers("/users/createNewUser/").permitAll()
+				.antMatchers("/users/editUser/").hasAnyRole("USER", "ADMIN")
 				.antMatchers("/showLogin").permitAll()
 				.antMatchers("/resources/**").permitAll()
 				.antMatchers("/h2/**").permitAll()
@@ -44,6 +46,7 @@ public class DemoSecurityConfig extends WebSecurityConfigurerAdapter {
 				.defaultSuccessUrl("/").permitAll()
 				.and()
 				.logout()
+				.logoutSuccessUrl("/")
 				.permitAll();
 
 		/*
