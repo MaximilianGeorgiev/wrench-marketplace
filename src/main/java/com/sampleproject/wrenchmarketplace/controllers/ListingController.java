@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.security.core.Authentication;
@@ -66,11 +67,11 @@ public class ListingController {
 	 */
 	private boolean loggedInUserOwnsListing(Authentication loggedInUser, int listingID) {
 		String loggedInUserName = loggedInUser.getName();
-		
+
 		if (!isUserLoggedIn(loggedInUser)) {
 			return false;
 		}
-		
+
 		int loggedInUserID = userService.findByusername(loggedInUserName).get().getId();
 
 		if (userService.findByListingIdInJoinedTable(loggedInUserID, listingID)) {
@@ -78,18 +79,21 @@ public class ListingController {
 		}
 		return false;
 	}
-	
-	/* Often used function, the user model is required for the nav bar of every single html view */
-	private User retrieveUserModel() {	
+
+	/*
+	 * Often used function, the user model is required for the nav bar of every
+	 * single html view
+	 */
+	private User retrieveUserModel() {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User user = new User();
-		
+
 		if (!isUserLoggedIn(loggedInUser)) {
 			return new User();
 		}
-		
+
 		user = userService.findByusername(loggedInUser.getName()).get();
-		
+
 		return user;
 	}
 
@@ -112,8 +116,7 @@ public class ListingController {
 		HashMap<Listing, ImageRoute> listingsAndThumbnails = new LinkedHashMap<>();
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		int userID = userService.findByusername(loggedInUser.getName()).get().getId();
-		
+
 		/*
 		 * Get all the listings and iterate through them. If the search word is
 		 * contained in either the description or the title (case insensitive). Then
@@ -168,17 +171,21 @@ public class ListingController {
 				}
 			});
 		} else if (criteria.equalsIgnoreCase("watched")) {
-			allListings.forEach(l -> {
-				if (userService.isUserWatchingListingId(userID, l.getId())) {
-					if (!getImageRoutesForListing(l.getId()).isEmpty()) {
-						ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
-						listingsAndThumbnails.put(l, thumbnail);
-					} else {
-						listingsAndThumbnails.put(l,
-								imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+			if (isUserLoggedIn(loggedInUser)) {
+				int userID = userService.findByusername(loggedInUser.getName()).get().getId();
+
+				allListings.forEach(l -> {
+					if (userService.isUserWatchingListingId(userID, l.getId())) {
+						if (!getImageRoutesForListing(l.getId()).isEmpty()) {
+							ImageRoute thumbnail = getImageRoutesForListing(l.getId()).get(0);
+							listingsAndThumbnails.put(l, thumbnail);
+						} else {
+							listingsAndThumbnails.put(l,
+									imageService.findByImageRoute("http://127.0.0.1:8033/no_image_found.jpg").get());
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		return listingsAndThumbnails;
@@ -188,13 +195,11 @@ public class ListingController {
 	public String createNewListing(Model theModel) {
 		Listing listing = new Listing();
 		List<Category> categories = categoryService.findAll();
-		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 
 		/*
 		 * Prepopulate category options by loading them from db and passing the model to
 		 * thymeleaf
 		 */
-
 		theModel.addAttribute("listing", listing);
 		theModel.addAttribute("categories", categories);
 		theModel.addAttribute("user", retrieveUserModel());
@@ -218,22 +223,25 @@ public class ListingController {
 			return "createNewListing";
 		}
 
-		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-		listingService.save(theListing);
-
-		userService.insertIntoUserListingJoinedTable(currentUser.getId(), theListing.getId());
-
 		for (MultipartFile file : files) {
 			if (file.isEmpty()) {
 				return "redirect:/";
 			}
 
 			String uploadedFileName = imageController.handleFileUpload(file);
-
-			imageService.insertIntoJoinedTable(theListing.getId(),
-					imageService.findByImageRoute(uploadedFileName).get().getId());
+			
+			try {
+				imageService.insertIntoJoinedTable(theListing.getId(),
+						imageService.findByImageRoute(uploadedFileName).get().getId());
+			} catch (Exception e) {
+				return "createNewListing";
+			}
 		}
+
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		User currentUser = userService.findByusername(loggedInUser.getName()).get();
+		listingService.save(theListing);
+		userService.insertIntoUserListingJoinedTable(currentUser.getId(), theListing.getId());
 
 		return "redirect:/";
 	}
@@ -267,9 +275,9 @@ public class ListingController {
 		List<ImageRoute> imageRoutes = getImageRoutesForListing(listingID);
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-	
+
 		isUserLoggedIn = (isUserLoggedIn(loggedInUser)) ? true : false;
-	
+
 		/*
 		 * Why is this so spaghetti code?
 		 * 
@@ -284,14 +292,13 @@ public class ListingController {
 		 */
 		if (isUserLoggedIn) {
 			int userID = userService.findByusername(loggedInUser.getName()).get().getId();
-			
+
 			if (userService.isUserWatchingListingId(userID, listingID)) {
 				theModel.addAttribute("isWatched", true);
 			} else {
 				theModel.addAttribute("isWatched", false);
 			}
-		}
-		 else {
+		} else {
 			theModel.addAttribute("isWatched", false);
 		}
 
@@ -304,11 +311,13 @@ public class ListingController {
 		return "viewlisting";
 	}
 
-	@PostMapping("/watch")
-	public String toggleWatchList(@RequestParam("Id") String Id, Model theModel) {
+	@GetMapping("/watch")
+	public String toggleWatchList(HttpServletRequest request, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-		int listingId = Integer.parseInt(Id);
+		
+		String listingIdURL = request.getQueryString().toString().substring(request.getQueryString().indexOf("=") + 1);
+		int listingId = Integer.parseInt(listingIdURL);
 		int userId = currentUser.getId();
 
 		/* if it's watched then remove from watch list */
@@ -316,28 +325,34 @@ public class ListingController {
 			userService.deleteFromWatchListJoinedTable(currentUser.getId());
 		} else {
 			/*
-			 * The user definitely exists, otherwise they wouldn't have a button
-			 * to @/watch (It's handled in the viewlisting.html) Add to
-			 * USER_WATCHLING JOIN TABLE
+			 * The user definitely exists, otherwise they wouldn't have a button to @/watch
+			 * (It's handled in the viewlisting.html) Add to USER_WATCHLING JOIN TABLE
 			 */
 			userService.insertIntoWatchListJoinedTable(currentUser.getId(), listingId);
 		}
 
 		return "redirect:/listings/viewListing/" + String.valueOf(listingId);
 	}
-	
+
 	/*
-	 * The search view is the same for: using the search bar, clicking on "Your listings", searching by category from the index
-	 * and also loading up your watched list. So why not have one search function for all of them?
-	 * POST mapping since the GET mapping appends the search word differently when the field is plain text and when the field is 
-	 * a bean property and makes it hard to fetch as a PathVariable that's why it is posted as a requestparam.
-	 * The searchListingByCriteria function will return all the listings necessary to display, along with their image routes 
-	 * and this will be bound with the model.
+	 * The search view is the same for: using the search bar, clicking on
+	 * "Your listings", searching by category from the index and also loading up
+	 * your watched list. So why not have one search function for all of them? POST
+	 * mapping since the GET mapping appends the search word differently when the
+	 * field is plain text and when the field is a bean property and makes it hard
+	 * to fetch as a PathVariable that's why it is posted as a requestparam. The
+	 * searchListingByCriteria function will return all the listings necessary to
+	 * display, along with their image routes and this will be bound with the model.
 	 */
 
-	@PostMapping("/search/{type}")
-	public String search(@PathVariable("type") String type, @RequestParam("searchWord") String searchWord,
+	@GetMapping("/search/**")
+	public String search(HttpServletRequest request,
 			Model theModel) {
+		
+		/* URL format: http://127.0.0.1:8080/listings/search/standard?searchWord=asdf&type=standard */
+		String searchWord = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1, request.getQueryString().indexOf("&"));
+		String type = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1);
+		
 		List<Listing> listingsFound = listingService.findAll();
 		HashMap<Listing, ImageRoute> listingsAndThumbnails = searchListingByCriteria(listingsFound, type, searchWord);
 
@@ -348,8 +363,10 @@ public class ListingController {
 		return "search";
 	}
 
-	@PostMapping("/edit")
-	public String editListing(@RequestParam("Id") String Id, Model theModel) {
+	@GetMapping("/edit")
+	public String editListing(HttpServletRequest request, Model theModel) {
+		String Id = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1);
+		
 		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(Id)).get());
 		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(Id)));
 		theModel.addAttribute("user", retrieveUserModel());

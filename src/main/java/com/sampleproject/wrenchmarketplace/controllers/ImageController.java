@@ -39,10 +39,9 @@ public class ImageController {
 		try {
 			String fileExtension = file.getOriginalFilename()
 					.substring(file.getOriginalFilename().lastIndexOf(".") + 1);
-
+			
 			/* check if extension is a valid image file, otherwise throw exception */
-			if (!(fileExtension.equals("png") || fileExtension.equals("jpg") || fileExtension.equals("jpeg"))
-					|| fileExtension.equals("bmp")) {
+			if (!fileExtension.equals("png")) {
 				throw new IllegalStateException();
 			}
 

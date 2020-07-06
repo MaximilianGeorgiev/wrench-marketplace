@@ -63,16 +63,18 @@
 							<li class="nav-item"><button class="btn btn-dark">Create
 									new listing</button></li>
 						</form>
-						<form th:action="@{listings/search/userlistings}" METHOD="POST">
+						<form th:action="@{/listings/search}">
 							<li class="nav-item"><button class="btn btn-dark"
 									th:value="${user.Id}" th:name="searchWord">Your
-									listings</button></li>
+									listings</button></li> <input type="hidden" th:name="type"
+								th:value="userlistings"></input>
 						</form>
-						<form th:action="@{/listings/search/watched}" METHOD="POST">
+						<form th:action="@{/listings/search}">
 							<li class="nav-item"><button class="btn btn-dark"
-									th:value="${user.Id}" th:name="searchWord">Watched</button></li>
+									th:value="${user.Id}" th:name="searchWord">Watched</button></li> <input
+								type="hidden" th:name="type" th:value="watched"></input>
 						</form>
-						<form th:action="@{users/viewUser}" METHOD="POST">
+						<form th:action="@{users/viewUser}">
 							<li class="nav-item"><button class="btn btn-dark"
 									th:value="${user.Id}" th:name="Id">Your profile</button></li>
 						</form>
@@ -93,11 +95,12 @@
 	<!-- Page Content -->
 	<div class="container">
 		<!-- Heading Row -->
-		<form th:action="@{/listings/search/standard}" method="POST">
+		<form th:action="@{/listings/search}">
 			<div class="row align-items-center my-5">
 				<div class="input-group md-form form-sm form-2 pl-0">
 					<input class="form-control my-55 py-1 red-border" type="text"
 						placeholder="Search" aria-label="Search" th:name="searchWord">
+					<input type="hidden" th:name="type" th:value="standard"></input>
 					<div class="input-group-append">
 						<button id="basic-text1">
 							<i class="fas fa-search text-grey" aria-hidden="true">Search</i>
@@ -126,34 +129,25 @@
 
 	</div>
 
-	<!-- /.row -->
-
 	<div class="col-lg-8">
 		<h1 class="font-weight-light" align="right">Browse by categories:
 		</h1>
 	</div>
 
-	<!-- Content Row -->
-
-	<form method="POST" th:action="@{/listings/search/category}">
+	<form th:action="@{/listings/search}">
 		<div class="row" th:each="category: ${categories}">
 			<button class="btn btn-secondary btn-lg btn-block"
 				th:value="${category.name}" th:text="${category.name}"
 				th:name="searchWord"></button>
-
 		</div>
+		<input type="hidden" th:name="type" th:value="category"></input>
 	</form>
-	</div>
-	<!-- /.row -->
-
-	</div>
-	<!-- /.container -->
 
 	<!-- Footer -->
 	<footer class="py-5 bg-dark">
 		<div class="container">
-			<p class="m-0 text-center text-white">Copyright &copy; Your
-				Website 2019</p>
+			<p class="m-0 text-center text-white">Copyright &copy; Wrench
+				Marketplace 2020</p>
 		</div>
 		<!-- /.container -->
 	</footer>
@@ -163,5 +157,4 @@
 	<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

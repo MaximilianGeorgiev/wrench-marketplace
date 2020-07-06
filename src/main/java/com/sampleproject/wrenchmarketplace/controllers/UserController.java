@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.security.core.Authentication;
@@ -87,10 +88,20 @@ public class UserController {
 		return "redirect:/";
 	}
 
-	@PostMapping("/viewUser")
-	public String viewUser(@RequestParam("Id") String Id, Model theModel) {
+	
+	@GetMapping("/viewUser/**")
+	public String viewUser(HttpServletRequest request, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-		int userID = Integer.parseInt(Id);
+
+		/* Previously used to be a post method due to my lack of knowledge, now the id of the user is appended to the url
+		 * I fetch the url which is in format {...users/viewUser?Id=1} and I get the ID of the customer which is the last digit 
+		 * Done as part of the refactoring work to allow the user to go back which is not possible with a POST method 
+		 * And here no sensitive information is being passed so no need for a POST method
+		 */
+		String query = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1);
+		System.out.println(query);
+		
+		int userID = Integer.parseInt(query);
 		
 		theModel.addAttribute("user", userService.findById(userID).get());
 		theModel.addAttribute("isOwner", loggedInUserOwnsProfile(loggedInUser, userID));

@@ -39,8 +39,9 @@ public class MainController {
 		if (!loggedUser.getPrincipal().equals("anonymousUser")) {
 			User user = userService.findByusername(loggedUser.getName()).get();
 			theModel.addAttribute("user", user);
-			theModel.addAttribute("categories", categoryService.findAll());
 		}
+		
+		theModel.addAttribute("categories", categoryService.findAll());
 		return "index";
 	}
 
