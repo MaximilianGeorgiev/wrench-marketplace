@@ -38,24 +38,14 @@ public class ListingController {
 	private ListingService listingService;
 	private UserService userService;
 	private ImageService imageService;
-	private ImageController imageController;
 	private CategoryService categoryService;
 
 	ListingController(ListingService listingService, UserService userService, ImageService imageService,
-			ImageController imageController, CategoryService categoryService) {
+			CategoryService categoryService) {
 		this.listingService = listingService;
 		this.userService = userService;
 		this.imageService = imageService;
-		this.imageController = imageController;
 		this.categoryService = categoryService;
-	}
-
-	private boolean isUserLoggedIn(Authentication loggedInUser) {
-		if (loggedInUser.getPrincipal().equals("anonymousUser")) {
-			return false;
-		}
-
-		return true;
 	}
 
 	/*
@@ -68,7 +58,7 @@ public class ListingController {
 	private boolean loggedInUserOwnsListing(Authentication loggedInUser, int listingID) {
 		String loggedInUserName = loggedInUser.getName();
 
-		if (!isUserLoggedIn(loggedInUser)) {
+		if (!userService.isUserLoggedIn(loggedInUser)) {
 			return false;
 		}
 
@@ -88,7 +78,7 @@ public class ListingController {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User user = new User();
 
-		if (!isUserLoggedIn(loggedInUser)) {
+		if (!userService.isUserLoggedIn(loggedInUser)) {
 			return new User();
 		}
 
@@ -171,7 +161,7 @@ public class ListingController {
 				}
 			});
 		} else if (criteria.equalsIgnoreCase("watched")) {
-			if (isUserLoggedIn(loggedInUser)) {
+			if (userService.isUserLoggedIn(loggedInUser)) {
 				int userID = userService.findByusername(loggedInUser.getName()).get().getId();
 
 				allListings.forEach(l -> {
@@ -228,8 +218,8 @@ public class ListingController {
 				return "redirect:/";
 			}
 
-			String uploadedFileName = imageController.handleFileUpload(file);
-			
+			String uploadedFileName = imageService.handleFileUpload(file);
+
 			try {
 				imageService.insertIntoJoinedTable(theListing.getId(),
 						imageService.findByImageRoute(uploadedFileName).get().getId());
@@ -248,7 +238,6 @@ public class ListingController {
 
 	@PostMapping("/deleteListing")
 	public String deleteListing(@RequestParam("Id") String passedId) {
-
 		Integer listingId = Integer.parseInt(passedId);
 
 		/*
@@ -266,8 +255,11 @@ public class ListingController {
 		return "redirect:/";
 	}
 
-	@GetMapping("/viewListing/{Id}")
-	public String viewListing(@PathVariable("Id") String Id, Model theModel) {
+	@GetMapping("/viewListing")
+	public String viewListing(HttpServletRequest request, Model theModel) {
+		String Id = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1,
+				request.getQueryString().lastIndexOf("=") + 2);
+		
 		Listing listing = listingService.findById(Integer.parseInt(Id)).get();
 		int listingID = listing.getId();
 		boolean isUserLoggedIn = false;
@@ -275,8 +267,7 @@ public class ListingController {
 		List<ImageRoute> imageRoutes = getImageRoutesForListing(listingID);
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
-
-		isUserLoggedIn = (isUserLoggedIn(loggedInUser)) ? true : false;
+		isUserLoggedIn = (userService.isUserLoggedIn(loggedInUser)) ? true : false;
 
 		/*
 		 * Why is this so spaghetti code?
@@ -315,7 +306,7 @@ public class ListingController {
 	public String toggleWatchList(HttpServletRequest request, Model theModel) {
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-		
+
 		String listingIdURL = request.getQueryString().toString().substring(request.getQueryString().indexOf("=") + 1);
 		int listingId = Integer.parseInt(listingIdURL);
 		int userId = currentUser.getId();
@@ -346,13 +337,22 @@ public class ListingController {
 	 */
 
 	@GetMapping("/search/**")
-	public String search(HttpServletRequest request,
-			Model theModel) {
-		
-		/* URL format: http://127.0.0.1:8080/listings/search/standard?searchWord=asdf&type=standard */
-		String searchWord = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1, request.getQueryString().indexOf("&"));
+	public String search(HttpServletRequest request, Model theModel) {
+
+		/*
+		 * URL format:
+		 * http://127.0.0.1:8080/listings/search/standard?searchWord=asdf&type=standard
+		 */
+		String searchWord = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1,
+				request.getQueryString().indexOf("&"));
 		String type = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1);
-		
+
+		/*
+		 * Spaces are appended with a plus sign whereas in the database info is stored
+		 * with spaces that's why plus must be replaced with space
+		 */
+		searchWord = (searchWord.contains("+")) ? searchWord.replace("+", " ") : searchWord;
+
 		List<Listing> listingsFound = listingService.findAll();
 		HashMap<Listing, ImageRoute> listingsAndThumbnails = searchListingByCriteria(listingsFound, type, searchWord);
 
@@ -363,12 +363,27 @@ public class ListingController {
 		return "search";
 	}
 
-	@GetMapping("/edit")
+	@GetMapping("/edit/**")
 	public String editListing(HttpServletRequest request, Model theModel) {
-		String Id = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1);
-		
-		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(Id)).get());
-		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(Id)));
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+
+		/*
+		 * URL format: http://127.0.0.1:8080/users/editListing?userID=1&listingID=1 Must
+		 * be fixed when there are more than 10 users
+		 */
+		String userID = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1,
+				request.getQueryString().indexOf("=") + 2);
+		String listingID = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1,
+				request.getQueryString().lastIndexOf("=") + 2);
+
+		/* No unauthorised edits */
+		if (!userService.isUserLoggedIn(loggedInUser)
+				|| !this.loggedInUserOwnsListing(loggedInUser, Integer.parseInt(listingID))) {
+			return "redirect:/";
+		}
+
+		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(userID)).get());
+		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(userID)));
 		theModel.addAttribute("user", retrieveUserModel());
 
 		return "editListing";
@@ -391,13 +406,14 @@ public class ListingController {
 			listingService.editDescription(theListing.getId(), theListing.getDescription());
 		}
 
-		// uploads new files and works but if the user decides to delete an image??
-		for (MultipartFile file : files) {
-			String uploadedFileName = imageController.handleFileUpload(file);
-			imageService.insertIntoJoinedTable(theListing.getId(),
-					imageService.findByImageRoute(uploadedFileName).get().getId());
-		}
+		return "redirect:/listings/viewListing?Id=" + theListing.getId();
+		/*
+		 * // uploads new files and works but if the user decides to delete an image??
+		 * for (MultipartFile file : files) { String uploadedFileName =
+		 * imageService.handleFileUpload(file);
+		 * imageService.insertIntoJoinedTable(theListing.getId(),
+		 * imageService.findByImageRoute(uploadedFileName).get().getId()); }
+		 */
 
-		return "redirect:/";
 	}
 }

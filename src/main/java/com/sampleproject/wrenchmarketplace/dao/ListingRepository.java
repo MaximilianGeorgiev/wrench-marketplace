@@ -35,7 +35,7 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
 	
 	@Transactional
 	@Modifying
-	@Query(value = "UPDATE LISTING l SET l.DESCCRIPTION = :description WHERE l.Id = :Id", nativeQuery = true)
+	@Query(value = "UPDATE LISTING l SET l.DESCRIPTION = :description WHERE l.Id = :Id", nativeQuery = true)
 	public void editDescription(@Param("Id")Integer Id, @Param("description") String description);
 	
 	@Transactional

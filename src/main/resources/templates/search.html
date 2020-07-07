@@ -121,16 +121,20 @@
 	<div class="row">
 		<div class="col-md-4 mb-5" th:each="listing: ${listingsAndThumbnails}">
 			<div class="card h-100">
-				<div class="card-body">
-					<img th:src="@{${listing.value.imageRoute}}" height="150"
-						width="360	"></img>
-					<h2 class="card-title" th:text="${listing.key.title}"></h2>
-					<p class="card-text" th:text="${listing.key.description}"></p>
-				</div>
-				<div class="card-footer">
-					<a th:href="@{/listings/viewListing/{id}(id=${listing.key.Id})}"
-						class="btn btn-primary btn-sm">View full listing</a>
-				</div>
+				<form th:action="@{/listings/viewListing}">
+					<input type="hidden" th:value="${listing.key.Id}" th:name="Id" />
+					<div class="card-body">
+						<img th:src="@{${listing.value.imageRoute}}" height="150"
+							width="360	"></img>
+						<h2 class="card-title" th:text="${listing.key.title}"></h2>
+						<p class="card-text" th:text="${listing.key.description}"></p>
+					</div>
+					<div class="card-footer">
+						<button class="btn btn-secondary btn-lg btn-block"
+				th:value="${listing.key.Id}" th:text="View + ' ' + full + ' ' + listing"
+				th:name="Id"></button>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>

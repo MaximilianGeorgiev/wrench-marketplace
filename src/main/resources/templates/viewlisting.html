@@ -108,11 +108,11 @@
 								th:text="${listing.phoneNumber}"></h1>
 
 							<form th:action="@{/listings/edit}">
-								<h3 class="nav-item" th:if="${isOwner} and ${isUserLoggedIn}">
-									<button class="btn btn-dark" th:value="${listing.Id}"
-										th:name="Id">Edit listing</button>
-								</h3>
-							</form>
+									<button class="list-group-item list-group-item-dark"
+										th:value="${user.Id}" th:name="userID" th:if="${isOwner}">Edit
+										listing</button>
+									<input type="hidden" th:value="${listing.Id}" th:name="listingID" />
+								</form>
 							<form th:action="@{/listings/watch}">
 								<h3 class="nav-item" th:if="${isOwner} and ${isUserLoggedIn}">
 									<button class="btn btn-dark" th:value="${listing.Id}"

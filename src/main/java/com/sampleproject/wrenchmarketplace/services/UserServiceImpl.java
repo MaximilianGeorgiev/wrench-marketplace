@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.sampleproject.wrenchmarketplace.dao.RoleRepository;
@@ -21,6 +22,14 @@ public class UserServiceImpl implements UserService {
 	public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+	}
+	
+	public boolean isUserLoggedIn(Authentication loggedInUser) {
+		if (loggedInUser.getPrincipal().equals("anonymousUser")) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private String hashPassword(String password) {

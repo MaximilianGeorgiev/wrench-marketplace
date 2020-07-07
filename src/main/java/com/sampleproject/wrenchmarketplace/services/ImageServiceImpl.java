@@ -1,10 +1,13 @@
 package com.sampleproject.wrenchmarketplace.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sampleproject.wrenchmarketplace.dao.ImageRepository;
 import com.sampleproject.wrenchmarketplace.entities.ImageRoute;
@@ -16,6 +19,45 @@ public class ImageServiceImpl implements ImageService {
 	
 	public ImageServiceImpl (ImageRepository imageRepository) {
 		this.imageRepository = imageRepository;
+	}
+	
+	/*
+	 * Stores the file physically in /resources/uploads Since a lot of browsers have
+	 * blocked loading resources from local files, the whole uploads directory has
+	 * been uploaded to a server (Web Server for Chrome extention). The file is
+	 * first saved with the absolute path to this folder but in the database the
+	 * server path is stored instead
+	 * 
+	 * Requires reconfiguring if someone else clones this project
+	 */
+
+	public String handleFileUpload(MultipartFile file) {
+		String absolutePathToUploads = "C://Repositories//wrench-marketplace//wrench-marketplace//src//main//resources//uploads//";
+		String filePath = absolutePathToUploads + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+		// current time milis in order to avoid duplicate names
+		String serverPathToUploads = "http://127.0.0.1:8033/";
+		String filePathOnServer = serverPathToUploads + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+		try {
+			String fileExtension = file.getOriginalFilename()
+					.substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+			
+			/* check if extension is a valid image file, otherwise throw exception */
+			if (!fileExtension.equals("png")) {
+				throw new IllegalStateException();
+			}
+
+			File dest = new File(filePath);
+			file.transferTo(dest);
+			save(new ImageRoute(0, filePathOnServer));
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return filePathOnServer;
 	}
 	
 	@Override

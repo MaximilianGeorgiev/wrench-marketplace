@@ -99,8 +99,7 @@ public class UserController {
 		 * And here no sensitive information is being passed so no need for a POST method
 		 */
 		String query = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1);
-		System.out.println(query);
-		
+	
 		int userID = Integer.parseInt(query);
 		
 		theModel.addAttribute("user", userService.findById(userID).get());
@@ -109,9 +108,28 @@ public class UserController {
 		return "viewuser";
 	}
 	
-	@GetMapping("/editUser/{Id}")
-	public String editUser(@PathVariable("Id") String Id, Model theModel) {
-		theModel.addAttribute("user", userService.findById(Integer.parseInt(Id)));
+	@GetMapping("/editUser")
+	public String editUser(HttpServletRequest request, Model theModel) {
+		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
+		
+		/* Unauthorised edit */
+		if (!userService.isUserLoggedIn(loggedInUser)) {
+			return "redirect:/";
+		}
+		
+		String query = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1);
+		int userID = Integer.parseInt(query);
+		
+		/* No unauthorised edits - html view calls getUser; appends the userId fetched from the html to the URL
+		 * and if the user is not logged in / doesn't own this profile they wont be able to access this API
+		 * The edit option is not visible if the user is not the owner of the profile anyway, this just prevents the direct 
+		 * API call 
+		 */
+		if (!loggedInUserOwnsProfile(loggedInUser, userID)) {
+			return "redirect:/";
+		}
+		
+		theModel.addAttribute("user", userService.findById(userID));
 
 		return "editUser";
 	}
@@ -142,6 +160,6 @@ public class UserController {
 			userService.editAge(userID, editedUser.getAge());
 		}
 
-		return "redirect:/users/viewUser/" + String.valueOf(userID);
+		return "redirect:/users/viewUser?Id=" + String.valueOf(userID);
 	}
 }

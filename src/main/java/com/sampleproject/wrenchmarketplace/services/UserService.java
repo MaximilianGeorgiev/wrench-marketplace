@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.Authentication;
 
 import com.sampleproject.wrenchmarketplace.entities.User;
 
 public interface UserService {
+	
+	public boolean isUserLoggedIn(Authentication loggedInUser);
 	
 	public void editPassword(Integer Id, String password);
 	
