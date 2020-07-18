@@ -49,6 +49,11 @@ public class ListingServiceImpl implements ListingService {
 	public void deleteListingFromListingImageJoinedTable(Integer listing_ID) {
 		listingRepository.deleteListingFromListingImageJoinedTable(listing_ID);
 	}
+	
+	@Override
+	public void deleteImageFromListingImageJoinedTable(@Param("image_ID") Integer image_ID) {
+		listingRepository.deleteImageFromListingImageJoinedTable(image_ID);
+	}
 
 	@Override
 	public void deleteListingFromUserListingJoinedTable(Integer listing_ID) {

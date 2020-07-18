@@ -115,10 +115,11 @@
 										th:value="${user.Id}" th:name="userID" th:if="${isOwner}">Edit
 										profile</button>
 								</form>
-								<form th:action="@{/listings/search/userlistings}" METHOD="POST">
+								<form th:action="@{/listings/search}">
 									<button class="list-group-item list-group-item-dark"
 										th:value="${user.Id}" th:name="searchWord">Show
-										listings</button>
+										listings</button> <input type="hidden" th:name="type"
+								th:value="userlistings"></input>
 								</form>
 							</h3>
 						</div>

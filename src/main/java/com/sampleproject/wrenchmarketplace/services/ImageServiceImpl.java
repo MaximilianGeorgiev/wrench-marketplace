@@ -35,22 +35,34 @@ public class ImageServiceImpl implements ImageService {
 		String absolutePathToUploads = "C://Repositories//wrench-marketplace//wrench-marketplace//src//main//resources//uploads//";
 		String filePath = absolutePathToUploads + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-		// current time milis in order to avoid duplicate names
+		/* current time milis in order to avoid duplicate names */
 		String serverPathToUploads = "http://127.0.0.1:8033/";
 		String filePathOnServer = serverPathToUploads + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+		
+		/* if file is already uploaded cease upload */
+		List<ImageRoute> routes = this.findAll();
+		
+		for (ImageRoute route : routes) {
+			if (route.getImageRoute().endsWith(file.getOriginalFilename())) {
+				return null;
+			}
+		}
 
 		try {
 			String fileExtension = file.getOriginalFilename()
 					.substring(file.getOriginalFilename().lastIndexOf(".") + 1);
 			
-			/* check if extension is a valid image file, otherwise throw exception */
-			if (!fileExtension.equals("png")) {
-				throw new IllegalStateException();
+			/* Need to find a way to display that the format is incorrect. */
+			if ((!fileExtension.equals("png")) && (!fileExtension.equals("jpg")
+									&& (!fileExtension.equals("jpeg")
+										&&	(!fileExtension.equals("bmp"))))) {
+				return null;
 			}
+			
 
 			File dest = new File(filePath);
 			file.transferTo(dest);
-			save(new ImageRoute(0, filePathOnServer));
+			save(new ImageRoute(filePathOnServer));
 		} catch (IllegalStateException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

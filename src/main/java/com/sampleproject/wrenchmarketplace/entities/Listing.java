@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 public class Listing {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "Id", nullable = false, unique = true) // if id is not set as not null throws exception since it is
 															// checked before a value is generated
 	private int id;

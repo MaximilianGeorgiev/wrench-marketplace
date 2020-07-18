@@ -18,7 +18,7 @@ public interface ImageRepository extends JpaRepository<ImageRoute, Integer> {
 
 	@Transactional
 	@Modifying
-	@Query(value = "INSERT INTO LISTING_IMAGE (listing_Id, image_Id) VALUES (:listing_Id, :image_Id);", nativeQuery = true)
+	@Query(value = "INSERT INTO LISTING_IMAGE (listing_Id, image_Id) VALUES (:listing_Id, :image_Id)", nativeQuery = true)
 	public void insertIntoJoinedTable(@Param("listing_Id") Integer listing_Id, @Param("image_Id") Integer image_Id);
 
 	/*

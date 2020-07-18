@@ -50,6 +50,11 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
 	
 	@Transactional
 	@Modifying
+	@Query(value = "DELETE FROM LISTING_IMAGE l WHERE l.image_Id = :image_ID", nativeQuery = true)
+	public void deleteImageFromListingImageJoinedTable(@Param("image_ID") Integer image_ID);
+	
+	@Transactional
+	@Modifying
 	@Query(value = "DELETE FROM USER_LISTING u WHERE u.listing_Id = :listing_ID", nativeQuery = true)
 	public void deleteListingFromUserListingJoinedTable(@Param("listing_ID") Integer listing_ID);
 	

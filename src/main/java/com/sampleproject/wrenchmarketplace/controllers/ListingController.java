@@ -207,18 +207,29 @@ public class ListingController {
 		 * into LISTING_IMAGE the following pair: {listing_id, image_id}. Also insert
 		 * into USER_LISTING the following pair: {user_id, listing_id}
 		 */
-
+		
 		// Validates fields
 		if (theBindingResult.hasErrors()) {
 			return "createNewListing";
 		}
+		
+		listingService.save(theListing);
 
 		for (MultipartFile file : files) {
 			if (file.isEmpty()) {
-				return "redirect:/";
+				break;
 			}
 
 			String uploadedFileName = imageService.handleFileUpload(file);
+			
+			/* handleFileUpload returns null in two cases:
+			 * 1. The uploaded file already exists (needed for editlisting)
+			 * 2. The uploaded file does not meet the required format (here)
+			 */
+			if (uploadedFileName == null) {
+				listingService.deleteById(theListing.getId());
+				return "redirect:/";
+			}
 
 			try {
 				imageService.insertIntoJoinedTable(theListing.getId(),
@@ -230,14 +241,14 @@ public class ListingController {
 
 		Authentication loggedInUser = SecurityContextHolder.getContext().getAuthentication();
 		User currentUser = userService.findByusername(loggedInUser.getName()).get();
-		listingService.save(theListing);
+		
 		userService.insertIntoUserListingJoinedTable(currentUser.getId(), theListing.getId());
 
 		return "redirect:/";
 	}
 
 	@PostMapping("/deleteListing")
-	public String deleteListing(@RequestParam("Id") String passedId) {
+	public String deleteListing(@RequestParam("listingId") String passedId) {
 		Integer listingId = Integer.parseInt(passedId);
 
 		/*
@@ -259,7 +270,7 @@ public class ListingController {
 	public String viewListing(HttpServletRequest request, Model theModel) {
 		String Id = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1,
 				request.getQueryString().lastIndexOf("=") + 2);
-		
+
 		Listing listing = listingService.findById(Integer.parseInt(Id)).get();
 		int listingID = listing.getId();
 		boolean isUserLoggedIn = false;
@@ -371,8 +382,6 @@ public class ListingController {
 		 * URL format: http://127.0.0.1:8080/users/editListing?userID=1&listingID=1 Must
 		 * be fixed when there are more than 10 users
 		 */
-		String userID = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1,
-				request.getQueryString().indexOf("=") + 2);
 		String listingID = request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1,
 				request.getQueryString().lastIndexOf("=") + 2);
 
@@ -382,8 +391,8 @@ public class ListingController {
 			return "redirect:/";
 		}
 
-		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(userID)).get());
-		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(userID)));
+		theModel.addAttribute("listing", listingService.findById(Integer.parseInt(listingID)).get());
+		theModel.addAttribute("imageRoutes", getImageRoutesForListing(Integer.parseInt(listingID)));
 		theModel.addAttribute("user", retrieveUserModel());
 
 		return "editListing";
@@ -405,15 +414,51 @@ public class ListingController {
 		if (!theListing.getDescription().equalsIgnoreCase(listingBeforeEdit.getDescription())) {
 			listingService.editDescription(theListing.getId(), theListing.getDescription());
 		}
+		
+		/* image handling */
+		for (MultipartFile file : files) {
+			if (files.length == 0) {
+				break;
+			}
+			
+			String uploadedFileName = imageService.handleFileUpload(file);
+			
+			/* imageServiceImpl returns null if this image route is found in the database;
+			 * avoiding duplicate uploads and randomly appearing new routes
+			 */
+			if (uploadedFileName.equals(null)) {
+				break;
+			}
+			
+			/* If the user is not trying to upload the same file as before, then it will be uploaded */
+			imageService.insertIntoJoinedTable(theListing.getId(),
+					imageService.findByImageRoute(uploadedFileName).get().getId());
+			
+		}
 
 		return "redirect:/listings/viewListing?Id=" + theListing.getId();
-		/*
-		 * // uploads new files and works but if the user decides to delete an image??
-		 * for (MultipartFile file : files) { String uploadedFileName =
-		 * imageService.handleFileUpload(file);
-		 * imageService.insertIntoJoinedTable(theListing.getId(),
-		 * imageService.findByImageRoute(uploadedFileName).get().getId()); }
-		 */
 
+	}
+	
+	/* Remove image is a href from editListing.html view; deletes the images from IMAGE table and LISTING_IMAGE table and returns
+	 * back the edit view so the customer can continue with the editing 
+	 * When the user clicks on the image it gets removed and the remaining images are updated real time */
+	@GetMapping("/removeImage")
+	public String removeImageOnListingEdit(@ModelAttribute("listing") Listing theListing, HttpServletRequest request, Model theModel) {
+		String imageRoute = request.getQueryString().substring(request.getQueryString().indexOf("=") + 1,
+				request.getQueryString().indexOf("&"));
+		
+		int listingID = Integer.parseInt(request.getQueryString().substring(request.getQueryString().lastIndexOf("=") + 1));	
+		int imageID = imageService.findByImageRoute(imageRoute).get().getId();
+		
+		listingService.deleteImageFromListingImageJoinedTable(imageID);
+		imageService.deleteById(imageID);
+		
+		User user = retrieveUserModel();
+	
+		theModel.addAttribute("listing", theListing);
+		theModel.addAttribute("imageRoutes", getImageRoutesForListing(theListing.getId()));
+		theModel.addAttribute("user", user);
+		return "redirect:/listings/edit?userID=" + user.getId() + "&listingID=" + listingID;
 	}
 }

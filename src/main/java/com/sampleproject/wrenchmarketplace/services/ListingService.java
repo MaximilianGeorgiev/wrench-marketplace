@@ -23,6 +23,8 @@ public interface ListingService {
 	
 	public void deleteListingFromUserListingJoinedTable(Integer listing_ID);
 	
+	public void deleteImageFromListingImageJoinedTable(Integer image_ID);
+	
 	public List<Listing> findAll();
 	
 	public Optional<Listing> findById(int theId);

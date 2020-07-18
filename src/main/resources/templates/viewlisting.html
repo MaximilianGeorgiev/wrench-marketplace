@@ -125,8 +125,8 @@
 
 							<form th:action="@{/listings/deleteListing}" METHOD="POST">
 								<h3 class="nav-item" th:if="${isOwner}">
-									<button class="btn btn-dark" th:value="${user.Id}"
-										th:name="searchWord">Delete listing</button>
+									<button class="btn btn-dark" th:value="${listing.Id}"
+										th:name="listingId">Delete listing</button>
 								</h3>
 							</form>
 

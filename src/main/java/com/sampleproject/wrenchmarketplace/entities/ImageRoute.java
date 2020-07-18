@@ -21,8 +21,7 @@ public class ImageRoute {
 	public ImageRoute() {
 	}
 
-	public ImageRoute(int id, String imageRoute) {
-		this.Id = id;
+	public ImageRoute(String imageRoute) {
 		this.imageRoute = imageRoute;
 	}
 

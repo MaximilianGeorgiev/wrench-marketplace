@@ -122,7 +122,6 @@
 		<div class="col-md-4 mb-5" th:each="listing: ${listingsAndThumbnails}">
 			<div class="card h-100">
 				<form th:action="@{/listings/viewListing}">
-					<input type="hidden" th:value="${listing.key.Id}" th:name="Id" />
 					<div class="card-body">
 						<img th:src="@{${listing.value.imageRoute}}" height="150"
 							width="360	"></img>
